@@ -1,0 +1,103 @@
+import { useEffect, useState } from "react";
+import { Image, Platform, Pressable, TextInput, View } from "react-native";
+import * as ImagePicker from "expo-image-picker";
+import { useLocalSearchParams } from "expo-router";
+import { MaterialCommunityIcons } from "@expo/vector-icons";
+import { AppText, Card, DemoNotice, PageHeader, Pill, PrimaryButton, Screen, SectionHeading, fontFamily, palette } from "@/components/nutriscan-ui";
+import { categoryLabel, t } from "@/lib/nutriscan-data";
+import type { Category } from "@/lib/nutriscan-data";
+import { useNutriScan } from "@/lib/nutriscan-state";
+
+const categories: Category[] = ["food", "personalCare", "household"];
+
+export default function ContributeScreen() {
+  const params = useLocalSearchParams<{ barcode?: string }>();
+  const { language, submissions, addSubmission } = useNutriScan();
+  const [name, setName] = useState("");
+  const [brand, setBrand] = useState("");
+  const [barcode, setBarcode] = useState(typeof params.barcode === "string" ? params.barcode : "");
+  const [category, setCategory] = useState<Category>("food");
+  const [frontPhotoUri, setFrontPhotoUri] = useState<string>();
+  const [backPhotoUri, setBackPhotoUri] = useState<string>();
+  const [notice, setNotice] = useState("");
+
+  useEffect(() => { if (typeof params.barcode === "string") setBarcode(params.barcode); }, [params.barcode]);
+
+  const addPhoto = async (side: "front" | "back") => {
+    try {
+      let result: ImagePicker.ImagePickerResult;
+      if (Platform.OS === "web") {
+        result = await ImagePicker.launchImageLibraryAsync({ mediaTypes: ["images"], quality: 0.8 });
+      } else {
+        result = await ImagePicker.launchCameraAsync({ mediaTypes: ["images"], quality: 0.8 });
+        if (result.canceled) return;
+      }
+      if (!result.canceled && result.assets[0]?.uri) {
+        if (side === "front") setFrontPhotoUri(result.assets[0].uri);
+        else setBackPhotoUri(result.assets[0].uri);
+      }
+    } catch {
+      setNotice(language === "en" ? "Photo access is unavailable here. You can still explore the form." : "এখানে ছবির সুবিধা পাওয়া যাচ্ছে না। ফর্মটি দেখতে পারেন।");
+    }
+  };
+
+  const submit = () => {
+    const cleanName = name.trim();
+    if (!cleanName || !frontPhotoUri || !backPhotoUri) return;
+    addSubmission({ name: cleanName, brand: brand.trim(), barcode: barcode.trim(), category, frontPhotoUri, backPhotoUri });
+    setNotice(t(language, "submissionSuccess"));
+    setName("");
+    setBrand("");
+    setFrontPhotoUri(undefined);
+    setBackPhotoUri(undefined);
+  };
+  const canSubmit = Boolean(name.trim() && frontPhotoUri && backPhotoUri);
+  const fieldStyle = { minHeight: 46, borderRadius: 13, borderWidth: 1, borderColor: palette.line, backgroundColor: palette.card, paddingHorizontal: 13, color: palette.ink, fontFamily: fontFamily(language), fontSize: 12 } as const;
+
+  return (
+    <Screen contentStyle={{ gap: 16 }}>
+      <PageHeader title={t(language, "contribute")} subtitle={t(language, "contributeTitle")} />
+      <AppText style={{ color: palette.muted, fontSize: 12, lineHeight: 19 }}>{t(language, "contributeBody")}</AppText>
+      <DemoNotice>{t(language, "localDemoSubmission")}</DemoNotice>
+      <View style={{ gap: 10 }}>
+        <SectionHeading title={t(language, "frontPhoto")} />
+        <PhotoSlot label={t(language, "frontPhoto")} uri={frontPhotoUri} onPress={() => addPhoto("front")} action={t(language, "addPhoto")} />
+        <SectionHeading title={t(language, "backPhoto")} />
+        <PhotoSlot label={t(language, "backPhoto")} uri={backPhotoUri} onPress={() => addPhoto("back")} action={t(language, "addPhoto")} />
+        <AppText style={{ color: palette.muted, fontSize: 10, lineHeight: 16 }}>{t(language, "uploadHint")}</AppText>
+      </View>
+      <Card style={{ gap: 11 }}>
+        <Field label={t(language, "productName")} value={name} onChangeText={setName} placeholder={language === "en" ? "e.g. product name on pack" : "যেমন প্যাকেটের পণ্যের নাম"} fieldStyle={fieldStyle} />
+        <Field label={t(language, "brandName")} value={brand} onChangeText={setBrand} placeholder={language === "en" ? "Brand / maker, if known" : "ব্র্যান্ড / প্রস্তুতকারক, জানা থাকলে"} fieldStyle={fieldStyle} />
+        <Field label={t(language, "barcode")} value={barcode} onChangeText={setBarcode} placeholder={t(language, "barcodePlaceholder")} fieldStyle={fieldStyle} keyboardType="number-pad" />
+        <AppText weight="semibold" style={{ fontSize: 12 }}>{t(language, "category")}</AppText>
+        <View style={{ flexDirection: "row", gap: 7 }}>
+          {categories.map((item) => <Pressable key={item} accessibilityRole="tab" accessibilityState={{ selected: item === category }} onPress={() => setCategory(item)} style={{ flex: 1, minHeight: 39, borderRadius: 12, borderWidth: 1, borderColor: item === category ? palette.green : palette.line, backgroundColor: item === category ? palette.green : palette.paper, alignItems: "center", justifyContent: "center", paddingHorizontal: 4 }}><AppText weight="semibold" numberOfLines={1} style={{ color: item === category ? palette.white : palette.ink, fontSize: 9 }}>{categoryLabel(item, language)}</AppText></Pressable>)}
+        </View>
+        <PrimaryButton title={t(language, "submitReview")} icon="send-outline" onPress={submit} disabled={!canSubmit} />
+        <AppText style={{ color: palette.muted, fontSize: 10, textAlign: "center" }}>{t(language, "pointsAfterReview")}</AppText>
+      </Card>
+      {notice ? <View style={{ flexDirection: "row", gap: 8, alignItems: "center", backgroundColor: palette.greenSoft, borderRadius: 13, padding: 12 }}><MaterialCommunityIcons name="check-circle-outline" size={18} color={palette.green} /><AppText style={{ flex: 1, color: palette.green, fontSize: 11 }}>{notice}</AppText></View> : null}
+      <View style={{ gap: 8 }}>
+        <SectionHeading title={t(language, "mySubmissions")} />
+        {submissions.length ? submissions.map((submission) => <Card key={submission.id} style={{ flexDirection: "row", gap: 11, alignItems: "center" }}>
+          <View style={{ width: 48, height: 48, borderRadius: 13, backgroundColor: palette.paper, alignItems: "center", justifyContent: "center", overflow: "hidden" }}><MaterialCommunityIcons name="package-variant-closed" size={23} color={palette.green} /></View>
+          <View style={{ flex: 1, gap: 4 }}><AppText weight="semibold" style={{ fontSize: 12 }}>{submission.name}</AppText><AppText style={{ color: palette.muted, fontSize: 10 }}>{submission.brand || categoryLabel(submission.category, language)}</AppText></View>
+          <Pill tone="amber">{t(language, "pendingReview")}</Pill>
+        </Card>) : <Card><AppText style={{ color: palette.muted, fontSize: 12 }}>{t(language, "noSubmissions")}</AppText></Card>}
+      </View>
+    </Screen>
+  );
+}
+
+function Field({ label, value, onChangeText, placeholder, fieldStyle, keyboardType }: { label: string; value: string; onChangeText: (value: string) => void; placeholder: string; fieldStyle: object; keyboardType?: "default" | "number-pad" }) {
+  return <View style={{ gap: 5 }}><AppText weight="semibold" style={{ fontSize: 11 }}>{label}</AppText><TextInput value={value} onChangeText={onChangeText} placeholder={placeholder} placeholderTextColor={palette.muted} keyboardType={keyboardType} style={fieldStyle} /></View>;
+}
+
+function PhotoSlot({ label, uri, onPress, action }: { label: string; uri?: string; onPress: () => void; action: string }) {
+  return <Pressable accessibilityRole="button" accessibilityLabel={`${action}: ${label}`} onPress={onPress} style={{ minHeight: 122, borderRadius: 17, borderWidth: 1, borderStyle: "dashed", borderColor: uri ? palette.green : "#CFC8B8", backgroundColor: uri ? palette.greenSoft : palette.card, alignItems: "center", justifyContent: "center", overflow: "hidden" }}>
+    {uri ? <><Image source={{ uri }} resizeMode="cover" style={{ width: "100%", height: 150 }} /><View style={{ position: "absolute", bottom: 8, right: 8, backgroundColor: palette.card, paddingHorizontal: 9, paddingVertical: 6, borderRadius: 11 }}><AppText weight="semibold" style={{ color: palette.green, fontSize: 10 }}>{languageText(action)}</AppText></View></> : <><MaterialCommunityIcons name="image-plus-outline" size={25} color={palette.green} /><AppText weight="semibold" style={{ fontSize: 12, marginTop: 7 }}>{action}</AppText><AppText style={{ fontSize: 10, color: palette.muted, marginTop: 2 }}>{label}</AppText></>}
+  </Pressable>;
+}
+
+function languageText(text: string) { return text; }
