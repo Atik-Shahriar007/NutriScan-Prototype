@@ -5,24 +5,31 @@ import type { Category, Language } from "@/lib/nutriscan-data";
 export type HistoryEntry = { productId: string; scannedAt: string };
 export type PrototypeSubmission = {
   id: string;
+  contributorKey?: string;
   name: string;
   brand: string;
   barcode: string;
   category: Category;
   frontPhotoUri?: string;
   backPhotoUri?: string;
+  frontImageUrl?: string;
+  backImageUrl?: string;
   createdAt: string;
-  status: "pending-review-demo";
+  status: "pending" | "accepted" | "rejected" | "needs-clearer-photo" | "pending-review-demo";
+  reviewNote?: string | null;
+  pointsAwarded?: number;
 };
 
 type StoredState = {
   language: Language;
   history: HistoryEntry[];
   submissions: PrototypeSubmission[];
+  contributorKey: string;
 };
 
 type AppState = StoredState & {
   ready: boolean;
+  contributorKey: string;
   setLanguage: (language: Language) => void;
   recordScan: (productId: string) => void;
   clearHistory: () => void;
@@ -32,10 +39,15 @@ type AppState = StoredState & {
 const STORAGE_KEY = "nutriscan-prototype-state-v1";
 const AppStateContext = createContext<AppState | null>(null);
 
+function createContributorKey() {
+  return `contributor-${Date.now()}-${Math.random().toString(36).slice(2, 14)}`;
+}
+
 export function NutriScanProvider({ children }: { children: React.ReactNode }) {
   const [language, setLanguage] = useState<Language>("en");
   const [history, setHistory] = useState<HistoryEntry[]>([]);
   const [submissions, setSubmissions] = useState<PrototypeSubmission[]>([]);
+  const [contributorKey, setContributorKey] = useState(createContributorKey);
   const [ready, setReady] = useState(false);
 
   useEffect(() => {
@@ -48,6 +60,7 @@ export function NutriScanProvider({ children }: { children: React.ReactNode }) {
           if (parsed.language === "en" || parsed.language === "bn") setLanguage(parsed.language);
           if (Array.isArray(parsed.history)) setHistory(parsed.history);
           if (Array.isArray(parsed.submissions)) setSubmissions(parsed.submissions);
+          if (typeof parsed.contributorKey === "string" && parsed.contributorKey.length >= 16) setContributorKey(parsed.contributorKey);
         } catch {
           // Ignore malformed prototype data; the user can continue with a clean local state.
         }
@@ -62,15 +75,16 @@ export function NutriScanProvider({ children }: { children: React.ReactNode }) {
 
   useEffect(() => {
     if (!ready) return;
-    const payload: StoredState = { language, history, submissions };
+    const payload: StoredState = { language, history, submissions, contributorKey };
     AsyncStorage.setItem(STORAGE_KEY, JSON.stringify(payload)).catch(() => undefined);
-  }, [language, history, submissions, ready]);
+  }, [language, history, submissions, contributorKey, ready]);
 
   const value = useMemo<AppState>(
     () => ({
       language,
       history,
       submissions,
+      contributorKey,
       ready,
       setLanguage,
       recordScan: (productId) => {
@@ -92,7 +106,7 @@ export function NutriScanProvider({ children }: { children: React.ReactNode }) {
         ]);
       },
     }),
-    [language, history, submissions, ready],
+    [language, history, submissions, contributorKey, ready],
   );
 
   return <AppStateContext.Provider value={value}>{children}</AppStateContext.Provider>;

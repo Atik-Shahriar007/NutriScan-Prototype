@@ -21,6 +21,9 @@
 - [x] The contribution flow captures/selects front and back/package-label photos plus product name, brand, category and optional barcode, then saves a local prototype submission.
 - [x] A submission is visibly marked as awaiting review and explicitly is not sent to a review team or automatically added as a verified catalog record.
 - [x] A sample leaderboard and accepted-points panel demonstrate recognition for helpful contributors; example rankings are identified as samples, points are gated on review, and they do not affect product grades or verification.
+- [x] Contribution photos and metadata can be submitted through a typed backend endpoint, stored through project storage when configured, and retained in a local preview fallback when storage/database services are unavailable.
+- [x] Contributions have pending, accepted, rejected and clearer-photo-needed review states; accepted contributions award fixed review points and preserve review notes.
+- [x] The leaderboard reads only accepted contributions whose submitter opted into public display; points do not affect product grades, verification or search ranking.
 
 ## 6. Support Us
 - [x] Support Us describes voluntary operating support, what contributions could fund, and the potential Bangladesh payment methods.
@@ -30,6 +33,6 @@
 - [x] Apply the approved **Delta Field Notes** direction: documentary/editorial warmth, paper tones, deep green accents, restrained amber, Bengali-capable typography, clear evidence cards, and spacious one-handed portrait layouts. The generated mark is used for the app identity, launcher and splash assets.
 
 ## Prototype boundary
-- The catalog, grade, leaderboard and evidence records are fictional local sample data; no production product database, live OCR, source-verification feed, moderation backend, account sync or payment integration is connected.
+- The catalog, grade and evidence records remain fictional local sample data; contribution submission, image storage fallback, review states and accepted-points leaderboard endpoints are now connected, while the product catalog, live OCR, source-verification feed, account sync and payment integration remain unconnected.
 - The Expo Web Preview uses manual barcode/demo lookup; the native camera path is implemented but has not been verified on a physical device. This is a previewable prototype, not an installed or store-ready iOS/Android release.
 - **NutriScan** is a working name only; trademark, domain and app-store name clearance have not been performed.
