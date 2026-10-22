@@ -110,6 +110,13 @@ export type CatalogEnrichment = {
   descriptionEn: string;
   descriptionBn: string;
   ingredients: { en: string; bn: string }[];
+  nutrition: {
+    serving: { en: string; bn: string };
+    values: { label: { en: string; bn: string }; value: { en: string; bn: string } }[];
+    status: "verified" | "demo" | "unknown";
+    source?: { en: string; bn: string };
+  };
+  evidence: { label: { en: string; bn: string }; value: { en: string; bn: string }; status: "verified" | "demo" | "unknown"; source?: { en: string; bn: string } }[];
 };
 
 export async function getDraftCatalog(id: string) {
@@ -131,6 +138,13 @@ export async function publishCatalogProduct(id: string, enrichment: CatalogEnric
     size: { en: enrichment.sizeEn.trim(), bn: enrichment.sizeBn.trim() },
     description: { en: enrichment.descriptionEn.trim(), bn: enrichment.descriptionBn.trim() },
     ingredients: enrichment.ingredients.map((ingredient) => ({ en: ingredient.en.trim(), bn: ingredient.bn.trim() })).filter((ingredient) => ingredient.en && ingredient.bn),
+    nutrition: {
+      serving: { en: enrichment.nutrition.serving.en.trim(), bn: enrichment.nutrition.serving.bn.trim() },
+      values: enrichment.nutrition.values.map((item) => ({ label: { en: item.label.en.trim(), bn: item.label.bn.trim() }, value: { en: item.value.en.trim(), bn: item.value.bn.trim() } })).filter((item) => item.label.en && item.label.bn && item.value.en && item.value.bn),
+      status: enrichment.nutrition.status,
+      source: enrichment.nutrition.source ? { en: enrichment.nutrition.source.en.trim(), bn: enrichment.nutrition.source.bn.trim() } : undefined,
+    },
+    evidence: enrichment.evidence.map((item) => ({ label: { en: item.label.en.trim(), bn: item.label.bn.trim() }, value: { en: item.value.en.trim(), bn: item.value.bn.trim() }, status: item.status, source: item.source ? { en: item.source.en.trim(), bn: item.source.bn.trim() } : undefined })).filter((item) => item.label.en && item.label.bn && item.value.en && item.value.bn),
     demo: false,
     gradeLabel: current.category === "food" ? { en: "Evidence review required", bn: "তথ্য যাচাই প্রয়োজন" } : { en: "Evidence summary", bn: "তথ্যের সারাংশ" },
   };

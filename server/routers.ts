@@ -41,6 +41,18 @@ export const appRouter = router({
       descriptionEn: z.string().min(1).max(500),
       descriptionBn: z.string().min(1).max(500),
       ingredients: z.array(z.object({ en: z.string().min(1).max(180), bn: z.string().min(1).max(180) })).max(40),
+      nutrition: z.object({
+        serving: z.object({ en: z.string().min(1).max(180), bn: z.string().min(1).max(180) }),
+        values: z.array(z.object({ label: z.object({ en: z.string().min(1).max(100), bn: z.string().min(1).max(100) }), value: z.object({ en: z.string().min(1).max(100), bn: z.string().min(1).max(100) }) })).max(20),
+        status: z.enum(["verified", "demo", "unknown"]),
+        source: z.object({ en: z.string().max(300), bn: z.string().max(300) }).optional(),
+      }),
+      evidence: z.array(z.object({
+        label: z.object({ en: z.string().min(1).max(120), bn: z.string().min(1).max(120) }),
+        value: z.object({ en: z.string().min(1).max(300), bn: z.string().min(1).max(300) }),
+        status: z.enum(["verified", "demo", "unknown"]),
+        source: z.object({ en: z.string().max(300), bn: z.string().max(300) }).optional(),
+      })).min(1).max(30),
     })).mutation(({ input }) => publishCatalogProduct(input.id, input)),
   }),
 
