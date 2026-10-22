@@ -75,6 +75,7 @@ export default function RootLayout() {
               <Stack.Screen name="scan" options={{ presentation: "modal" }} />
               <Stack.Screen name="product/[id]" options={{ presentation: "card" }} />
               <Stack.Screen name="admin/review" options={{ presentation: "card" }} />
+              <Stack.Screen name="admin/catalog" options={{ presentation: "card" }} />
               <Stack.Screen name="oauth/callback" />
             </Stack>
           </NutriScanProvider>
