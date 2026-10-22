@@ -2,6 +2,13 @@ export type Language = "en" | "bn";
 export type Category = "food" | "personalCare" | "household";
 
 export type Localized = { en: string; bn: string };
+export type EvidenceItem = { label: Localized; value: Localized; status: "demo" | "unknown" | "verified"; source?: Localized };
+export type NutritionProfile = {
+  serving: Localized;
+  values: { label: Localized; value: Localized }[];
+  status: "demo" | "unknown" | "verified";
+  source?: Localized;
+};
 
 export type Product = {
   id: string;
@@ -17,7 +24,8 @@ export type Product = {
   score?: number;
   gradeLabel?: Localized;
   factors: { label: Localized; value: number | null; weight?: string; note: Localized }[];
-  evidence: { label: Localized; value: Localized; status: "demo" | "unknown" }[];
+  nutrition?: NutritionProfile;
+  evidence: EvidenceItem[];
 };
 
 export const products: Product[] = [
@@ -43,6 +51,16 @@ export const products: Product[] = [
       { en: "Used to adjust acidity; the specific additive and source are not identified.", bn: "অম্লতা ঠিক রাখতে ব্যবহৃত হয়; নির্দিষ্ট অ্যাডিটিভ ও উৎস শনাক্ত করা হয়নি।" },
     ],
     demo: true,
+    nutrition: {
+      serving: { en: "Per 250 ml pack · illustrative only", bn: "প্রতি ২৫০ মি.লি. প্যাক · শুধু উদাহরণ" },
+      values: [
+        { label: { en: "Energy", bn: "শক্তি" }, value: { en: "Not supplied", bn: "দেওয়া হয়নি" } },
+        { label: { en: "Total sugar", bn: "মোট চিনি" }, value: { en: "Not supplied", bn: "দেওয়া হয়নি" } },
+        { label: { en: "Sodium", bn: "সোডিয়াম" }, value: { en: "Not supplied", bn: "দেওয়া হয়নি" } },
+      ],
+      status: "unknown",
+      source: { en: "No nutrition panel was verified for this demo record.", bn: "এই ডেমো রেকর্ডে কোনো পুষ্টি প্যানেল যাচাই করা হয়নি।" },
+    },
     score: 72,
     gradeLabel: { en: "Needs context", bn: "প্রেক্ষাপটসহ দেখুন" },
     factors: [

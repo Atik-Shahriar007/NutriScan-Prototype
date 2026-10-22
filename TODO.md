@@ -8,6 +8,7 @@
 ## 2. Explainable results and Bangladesh-relevant trust evidence
 - [x] The food example exposes its illustrative grade, method, criteria, factor-level effects, evidence fields and limitations rather than presenting an unexplained score. Its weights and value are explicitly placeholders—not Yuka's scoring formula or a finalized NutriScan method.
 - [x] The food detail includes clearly labelled prototype fields for nutrition values, allergens, halal evidence, source-dependent additive/E-number considerations and BSTI evidence, with sample/unknown status and visible uncertainty. No actual product verification, official certification or external evidence feed is connected.
+- [x] Product records now have typed nutrition profiles and evidence statuses (`verified`, `demo`, `unknown`) with optional source notes; product details render structured nutrition rows and never infer missing quantities.
 - [x] Sample and unverified information is identified as such. No prototype score or label is represented as an official certification, laboratory result, medical judgment or real product-safety determination.
 
 ## 3. Bangla/English experience
@@ -46,6 +47,6 @@
 - [x] Publication validates required localized fields, increments the catalog version, changes status to published and refreshes public catalog reads; incomplete drafts remain out of public search.
 
 ## Prototype boundary
-- The product catalog schema and read API are now connected, but the current bundled records remain fictional local sample data until real reviewed records are seeded; live OCR, source-verification feed, account sync, cloud-synced history and payment integration remain unconnected.
+- The product catalog schema and read API are now connected, but the current bundled records remain fictional local sample data until real reviewed records are seeded; structured nutrition/evidence fields are ready, while live OCR, source-verification feed, account sync, cloud-synced history and payment integration remain unconnected.
 - The Expo Web Preview uses manual barcode/demo lookup; the native camera path is implemented but has not been verified on a physical device. This is a previewable prototype, not an installed or store-ready iOS/Android release.
 - **NutriScan** is a working name only; trademark, domain and app-store name clearance have not been performed.
