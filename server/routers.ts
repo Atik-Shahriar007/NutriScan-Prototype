@@ -52,6 +52,8 @@ export const appRouter = router({
         value: z.object({ en: z.string().min(1).max(300), bn: z.string().min(1).max(300) }),
         status: z.enum(["verified", "demo", "unknown"]),
         source: z.object({ en: z.string().max(300), bn: z.string().max(300) }).optional(),
+        sourceUrl: z.string().url().refine((value) => value.startsWith("https://"), "Evidence sources must use HTTPS").optional(),
+        verifiedAt: z.string().date().optional(),
       })).min(1).max(30),
     })).mutation(({ input }) => publishCatalogProduct(input.id, input)),
   }),

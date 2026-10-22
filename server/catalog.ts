@@ -116,7 +116,7 @@ export type CatalogEnrichment = {
     status: "verified" | "demo" | "unknown";
     source?: { en: string; bn: string };
   };
-  evidence: { label: { en: string; bn: string }; value: { en: string; bn: string }; status: "verified" | "demo" | "unknown"; source?: { en: string; bn: string } }[];
+  evidence: { label: { en: string; bn: string }; value: { en: string; bn: string }; status: "verified" | "demo" | "unknown"; source?: { en: string; bn: string }; sourceUrl?: string; verifiedAt?: string }[];
 };
 
 export async function getDraftCatalog(id: string) {
@@ -144,7 +144,7 @@ export async function publishCatalogProduct(id: string, enrichment: CatalogEnric
       status: enrichment.nutrition.status,
       source: enrichment.nutrition.source ? { en: enrichment.nutrition.source.en.trim(), bn: enrichment.nutrition.source.bn.trim() } : undefined,
     },
-    evidence: enrichment.evidence.map((item) => ({ label: { en: item.label.en.trim(), bn: item.label.bn.trim() }, value: { en: item.value.en.trim(), bn: item.value.bn.trim() }, status: item.status, source: item.source ? { en: item.source.en.trim(), bn: item.source.bn.trim() } : undefined })).filter((item) => item.label.en && item.label.bn && item.value.en && item.value.bn),
+    evidence: enrichment.evidence.map((item) => ({ label: { en: item.label.en.trim(), bn: item.label.bn.trim() }, value: { en: item.value.en.trim(), bn: item.value.bn.trim() }, status: item.status, source: item.source ? { en: item.source.en.trim(), bn: item.source.bn.trim() } : undefined, sourceUrl: item.sourceUrl?.trim() || undefined, verifiedAt: item.verifiedAt?.trim() || undefined })).filter((item) => item.label.en && item.label.bn && item.value.en && item.value.bn),
     demo: false,
     gradeLabel: current.category === "food" ? { en: "Evidence review required", bn: "তথ্য যাচাই প্রয়োজন" } : { en: "Evidence summary", bn: "তথ্যের সারাংশ" },
   };

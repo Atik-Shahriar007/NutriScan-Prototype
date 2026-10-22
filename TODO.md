@@ -47,8 +47,9 @@
 - [x] An admin catalog screen can enrich draft records with Bangla/English names, brands, size, description and bilingual ingredients before publishing them.
 - [x] Publication validates required localized fields, increments the catalog version, changes status to published and refreshes public catalog reads; incomplete drafts remain out of public search.
 - [x] The moderator form now captures bilingual nutrition rows, serving context, nutrition status/source, and evidence rows with explicit `verified`, `demo` or `unknown` status before publication.
+- [x] Evidence records can carry an HTTPS provenance URL and ISO verification date; the server validates both and product details expose a clickable source link plus the checked date.
 
 ## Prototype boundary
-- The product catalog schema and read API are now connected, but the current bundled records remain fictional local sample data until real reviewed records are seeded; structured nutrition/evidence fields are ready, while live OCR, source-verification feed, account sync, cloud-synced history and payment integration remain unconnected.
+- The product catalog schema and read API are now connected, but the current bundled records remain fictional local sample data until real reviewed records are seeded; structured nutrition/evidence and manual provenance fields are ready, while live OCR, automated source-verification feed, account sync, cloud-synced history and payment integration remain unconnected.
 - The Expo Web Preview uses manual barcode/demo lookup; the native camera path is implemented but has not been verified on a physical device. This is a previewable prototype, not an installed or store-ready iOS/Android release.
 - **NutriScan** is a working name only; trademark, domain and app-store name clearance have not been performed.

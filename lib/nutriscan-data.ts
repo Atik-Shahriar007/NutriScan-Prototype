@@ -2,7 +2,7 @@ export type Language = "en" | "bn";
 export type Category = "food" | "personalCare" | "household";
 
 export type Localized = { en: string; bn: string };
-export type EvidenceItem = { label: Localized; value: Localized; status: "demo" | "unknown" | "verified"; source?: Localized };
+export type EvidenceItem = { label: Localized; value: Localized; status: "demo" | "unknown" | "verified"; source?: Localized; sourceUrl?: string; verifiedAt?: string };
 export type NutritionProfile = {
   serving: Localized;
   values: { label: Localized; value: Localized }[];

@@ -1,5 +1,5 @@
 import { useRouter, useLocalSearchParams } from "expo-router";
-import { Pressable, View } from "react-native";
+import { Linking, Pressable, View } from "react-native";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { AppText, Card, DemoNotice, PageHeader, Pill, PrimaryButton, Screen, SecondaryButton, palette } from "@/components/nutriscan-ui";
 import { categoryLabel, productById, productName, productBrand, t } from "@/lib/nutriscan-data";
@@ -75,7 +75,7 @@ export default function ProductDetailScreen() {
         <Card style={{ paddingVertical: 3, gap: 0 }}>
           {product.evidence.map((item, index) => <View key={item.label.en} style={{ flexDirection: "row", alignItems: "flex-start", gap: 10, paddingVertical: 11, borderBottomWidth: index === product.evidence.length - 1 ? 0 : 1, borderBottomColor: palette.line }}>
             <MaterialCommunityIcons name={item.status === "verified" ? "check-decagram-outline" : item.status === "demo" ? "file-document-outline" : "help-circle-outline"} size={17} color={item.status === "verified" ? palette.green : item.status === "demo" ? palette.green : "#805915"} />
-            <View style={{ flex: 1, gap: 3 }}><AppText weight="semibold" style={{ fontSize: 11 }}>{item.label[language]}</AppText><AppText style={{ color: palette.muted, fontSize: 10, lineHeight: 16 }}>{item.value[language]}</AppText>{item.source ? <AppText style={{ color: palette.muted, fontSize: 9, lineHeight: 14 }}>{item.source[language]}</AppText> : null}</View>
+            <View style={{ flex: 1, gap: 3 }}><AppText weight="semibold" style={{ fontSize: 11 }}>{item.label[language]}</AppText><AppText style={{ color: palette.muted, fontSize: 10, lineHeight: 16 }}>{item.value[language]}</AppText>{item.source ? <AppText style={{ color: palette.muted, fontSize: 9, lineHeight: 14 }}>{item.source[language]}</AppText> : null}{item.verifiedAt ? <AppText style={{ color: palette.muted, fontSize: 9 }}>{language === "en" ? `Checked ${item.verifiedAt}` : `যাচাই: ${item.verifiedAt}`}</AppText> : null}{item.sourceUrl ? <Pressable accessibilityRole="link" onPress={() => void Linking.openURL(item.sourceUrl!)}><AppText weight="semibold" style={{ color: palette.green, fontSize: 9 }}>{language === "en" ? "Open source link" : "উৎসের লিংক খুলুন"}</AppText></Pressable> : null}</View>
             <Pill tone={item.status === "verified" ? "green" : item.status === "demo" ? "amber" : "neutral"}>{item.status === "verified" ? (language === "en" ? "Verified" : "যাচাইকৃত") : item.status === "demo" ? t(language, "sample") : t(language, "unknown")}</Pill>
           </View>)}
         </Card>
