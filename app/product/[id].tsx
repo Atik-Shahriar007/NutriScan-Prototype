@@ -4,13 +4,16 @@ import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { AppText, Card, DemoNotice, PageHeader, Pill, PrimaryButton, Screen, SecondaryButton, palette } from "@/components/nutriscan-ui";
 import { categoryLabel, productById, productName, productBrand, t } from "@/lib/nutriscan-data";
 import { useNutriScan } from "@/lib/nutriscan-state";
+import { trpc } from "@/lib/trpc";
 
 export default function ProductDetailScreen() {
   const router = useRouter();
   const { id, historyId } = useLocalSearchParams<{ id: string; historyId?: string }>();
   const { language, history } = useNutriScan();
   const historyEntry = typeof historyId === "string" ? history.find((entry) => entry.id === historyId) : undefined;
-  const product = historyEntry?.productSnapshot ?? productById(typeof id === "string" ? id : undefined);
+  const productId = typeof id === "string" ? id : "unknown";
+  const productQuery = trpc.catalog.byId.useQuery({ id: productId }, { enabled: productId !== "unknown", retry: false, staleTime: 60_000 });
+  const product = historyEntry?.productSnapshot ?? productQuery.data ?? productById(typeof id === "string" ? id : undefined);
   if (!product) return <Screen><PageHeader title={t(language, "productNotFound")} /><SecondaryButton title={language === "en" ? "Back" : "ফিরে যান"} onPress={() => router.back()} /></Screen>;
 
   return (

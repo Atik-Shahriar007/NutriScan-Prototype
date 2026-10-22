@@ -13,7 +13,7 @@ export type Product = {
   description: Localized;
   ingredients: Localized[];
   ingredientExplanations?: Localized[];
-  demo: true;
+  demo: boolean;
   score?: number;
   gradeLabel?: Localized;
   factors: { label: Localized; value: number | null; weight?: string; note: Localized }[];

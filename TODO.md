@@ -36,7 +36,12 @@
 ## 7. Approved NutriScan visual direction
 - [x] Apply the approved **Delta Field Notes** direction: documentary/editorial warmth, paper tones, deep green accents, restrained amber, Bengali-capable typography, clear evidence cards, and spacious one-handed portrait layouts. The generated mark is used for the app identity, launcher and splash assets.
 
+## 8. Published product catalog layer
+- [x] The backend has a versioned product-catalog table with barcode, category, localized summary fields, published/draft/archived status and a JSON detail record for the category-aware product view.
+- [x] Public catalog list, ID lookup and barcode lookup procedures are available through tRPC and filter database records to published status.
+- [x] Home catalog browsing, barcode lookup, scanner demo selection and product details use the catalog API when available and retain the local demo catalog as an offline/development fallback.
+
 ## Prototype boundary
-- The catalog, grade and evidence records remain fictional local sample data; contribution submission, image storage fallback, review states and accepted-points leaderboard endpoints are now connected, while the product catalog, live OCR, source-verification feed, account sync, cloud-synced history and payment integration remain unconnected.
+- The product catalog schema and read API are now connected, but the current bundled records remain fictional local sample data until real reviewed records are seeded; live OCR, source-verification feed, account sync, cloud-synced history and payment integration remain unconnected.
 - The Expo Web Preview uses manual barcode/demo lookup; the native camera path is implemented but has not been verified on a physical device. This is a previewable prototype, not an installed or store-ready iOS/Android release.
 - **NutriScan** is a working name only; trademark, domain and app-store name clearance have not been performed.

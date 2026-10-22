@@ -15,6 +15,13 @@
       "when": 1792533379412,
       "tag": "0001_funny_toad",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "5",
+      "when": 1792673074391,
+      "tag": "0002_lame_shard",
+      "breakpoints": true
     }
   ]
 }

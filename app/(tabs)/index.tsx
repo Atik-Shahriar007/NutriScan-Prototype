@@ -6,21 +6,24 @@ import { AppText, Card, DemoNotice, PageHeader, Pill, PrimaryButton, ProductRow,
 import { categoryLabel, productByBarcode, products, t } from "@/lib/nutriscan-data";
 import type { Category } from "@/lib/nutriscan-data";
 import { useNutriScan } from "@/lib/nutriscan-state";
+import { trpc } from "@/lib/trpc";
 
 export default function HomeScreen() {
   const router = useRouter();
   const { language, history, recordScan } = useNutriScan();
+  const catalogQuery = trpc.catalog.list.useQuery(undefined, { retry: false, staleTime: 60_000 });
+  const catalogProducts = catalogQuery.data?.length ? catalogQuery.data : products;
   const [category, setCategory] = useState<Category>("food");
   const [barcode, setBarcode] = useState("");
   const [query, setQuery] = useState("");
-  const visibleProducts = useMemo(() => products.filter((product) => {
+  const visibleProducts = useMemo(() => catalogProducts.filter((product) => {
     const words = `${product.name.en} ${product.name.bn} ${product.brand.en} ${product.brand.bn}`.toLowerCase();
     return product.category === category && (!query.trim() || words.includes(query.trim().toLowerCase()));
-  }), [category, query]);
+  }), [catalogProducts, category, query]);
   const normalizeBarcode = (value: string) => value.trim().replace(/[০-৯]/g, (digit) => String("০১২৩৪৫৬৭৮৯".indexOf(digit)));
   const openBarcode = () => {
     const code = normalizeBarcode(barcode);
-    const product = productByBarcode(code);
+    const product = catalogProducts.find((item) => item.barcode === code) ?? productByBarcode(code);
     if (product) {
       recordScan(product.id);
       router.push({ pathname: "/product/[id]", params: { id: product.id } });

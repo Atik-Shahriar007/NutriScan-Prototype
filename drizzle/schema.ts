@@ -53,3 +53,28 @@ export const contributions = mysqlTable(
 
 export type Contribution = typeof contributions.$inferSelect;
 export type InsertContribution = typeof contributions.$inferInsert;
+
+export const productCatalog = mysqlTable(
+  "productCatalog",
+  {
+    id: varchar("id", { length: 64 }).primaryKey(),
+    barcode: varchar("barcode", { length: 32 }).notNull().unique(),
+    category: mysqlEnum("category", ["food", "personalCare", "household"]).notNull(),
+    nameEn: varchar("nameEn", { length: 180 }).notNull(),
+    nameBn: varchar("nameBn", { length: 180 }).notNull(),
+    brandEn: varchar("brandEn", { length: 180 }).notNull(),
+    brandBn: varchar("brandBn", { length: 180 }).notNull(),
+    recordJson: text("recordJson").notNull(),
+    status: mysqlEnum("status", ["draft", "published", "archived"]).default("draft").notNull(),
+    version: int("version").default(1).notNull(),
+    createdAt: timestamp("createdAt").defaultNow().notNull(),
+    updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+  },
+  (table) => ({
+    barcodeIdx: index("product_catalog_barcode_idx").on(table.barcode),
+    statusIdx: index("product_catalog_status_idx").on(table.status),
+  }),
+);
+
+export type ProductCatalogRecord = typeof productCatalog.$inferSelect;
+export type InsertProductCatalogRecord = typeof productCatalog.$inferInsert;

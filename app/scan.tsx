@@ -6,6 +6,7 @@ import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { AppText, Card, DemoNotice, PageHeader, Pill, PrimaryButton, ProductRow, Screen, SecondaryButton, fontFamily, palette } from "@/components/nutriscan-ui";
 import { productByBarcode, products, t } from "@/lib/nutriscan-data";
 import { useNutriScan } from "@/lib/nutriscan-state";
+import { trpc } from "@/lib/trpc";
 
 const normalizeBarcode = (value: string) => value.trim().replace(/[০-৯]/g, (digit) => String("০১২৩৪৫৬৭৮৯".indexOf(digit)));
 
@@ -13,6 +14,8 @@ export default function ScanScreen() {
   const router = useRouter();
   const params = useLocalSearchParams<{ barcode?: string }>();
   const { language, recordScan } = useNutriScan();
+  const catalogQuery = trpc.catalog.list.useQuery(undefined, { retry: false, staleTime: 60_000 });
+  const catalogProducts = catalogQuery.data?.length ? catalogQuery.data : products;
   const [permission, requestPermission] = useCameraPermissions();
   const [barcode, setBarcode] = useState(typeof params.barcode === "string" ? params.barcode : "");
   const [notFoundCode, setNotFoundCode] = useState("");
@@ -25,7 +28,7 @@ export default function ScanScreen() {
   const openCode = (raw: string) => {
     const code = normalizeBarcode(raw);
     if (!code) return;
-    const product = productByBarcode(code);
+    const product = catalogProducts.find((item) => item.barcode === code) ?? productByBarcode(code);
     if (product) {
       recordScan(product.id);
       router.replace({ pathname: "/product/[id]", params: { id: product.id } });
@@ -74,7 +77,7 @@ export default function ScanScreen() {
       <View style={{ gap: 10 }}>
         <AppText weight="semibold" style={{ fontSize: 14 }}>{t(language, "chooseDemo")}</AppText>
         <Card style={{ paddingHorizontal: 13, paddingVertical: 2, gap: 0 }}>
-          {products.map((product, index) => <View key={product.id}>{index ? <View style={{ height: 1, backgroundColor: palette.line }} /> : null}<ProductRow product={product} onPress={() => openCode(product.barcode)} aside={<MaterialCommunityIcons name="chevron-right" size={19} color={palette.muted} />} /></View>)}
+          {catalogProducts.map((product, index) => <View key={product.id}>{index ? <View style={{ height: 1, backgroundColor: palette.line }} /> : null}<ProductRow product={product} onPress={() => openCode(product.barcode)} aside={<MaterialCommunityIcons name="chevron-right" size={19} color={palette.muted} />} /></View>)}
         </Card>
       </View>
       <DemoNotice>{language === "en" ? "Camera results only match the prototype’s fictional demo codes. Unknown codes are not safety judgments." : "ক্যামেরা কেবল প্রোটোটাইপের কাল্পনিক ডেমো কোড মিলিয়ে দেখে। অচেনা কোড মানেই নিরাপত্তা-সংক্রান্ত রায় নয়।"}</DemoNotice>

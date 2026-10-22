@@ -6,6 +6,7 @@ import { systemRouter } from "./_core/systemRouter";
 import { adminProcedure, publicProcedure, router } from "./_core/trpc";
 import { z } from "zod";
 import { createContribution, getLeaderboard, listContributions, reviewContribution } from "./contributions";
+import { getCatalogProduct, getCatalogProductByBarcode, listCatalog } from "./catalog";
 
 export const appRouter = router({
   // if you need to use socket.io, read and register route in server/_core/index.ts, all api should start with '/api/' so that the gateway can route correctly
@@ -22,6 +23,12 @@ export const appRouter = router({
         success: true,
       } as const;
     }),
+  }),
+
+  catalog: router({
+    list: publicProcedure.query(() => listCatalog()),
+    byId: publicProcedure.input(z.object({ id: z.string().min(1).max(64) })).query(({ input }) => getCatalogProduct(input.id)),
+    byBarcode: publicProcedure.input(z.object({ barcode: z.string().min(1).max(32) })).query(({ input }) => getCatalogProductByBarcode(input.barcode)),
   }),
 
   contributions: router({
