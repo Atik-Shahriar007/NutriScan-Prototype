@@ -29,6 +29,7 @@
 - [x] The leaderboard reads only accepted contributions whose submitter opted into public display; points do not affect product grades, verification or search ranking.
 - [x] An admin-only moderation queue displays both package images and submission metadata, supports accept/reject/clearer-photo actions, and keeps accepted items out of the public catalog until enrichment and publication.
 - [x] Accepting a contribution creates or links a draft catalog record and never auto-publishes an unverified product.
+- [x] The moderation interface has status tabs for pending, clearer-photo, accepted and rejected records, keeps reviewed decisions visible as an audit history, stores editable moderator notes, and links accepted records directly to catalog enrichment.
 
 ## 6. Support Us
 - [x] Support Us describes voluntary operating support, what contributions could fund, and the potential Bangladesh payment methods.

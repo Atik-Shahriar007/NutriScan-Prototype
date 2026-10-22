@@ -101,14 +101,16 @@ export async function listContributions(contributorKey: string) {
   return memoryContributions.filter((row) => row.contributorKey === contributorKey).map(publicContribution);
 }
 
-export async function listPendingContributions() {
+export async function listReviewContributions(status: ContributionStatus = "pending") {
   const db = await getDb();
   if (db) {
-    const rows = await db.select().from(contributions).where(eq(contributions.status, "pending")).orderBy(desc(contributions.createdAt));
+    const rows = await db.select().from(contributions).where(eq(contributions.status, status)).orderBy(desc(contributions.createdAt));
     return rows.map(publicContribution);
   }
-  return memoryContributions.filter((row) => row.status === "pending").map(publicContribution);
+  return memoryContributions.filter((row) => row.status === status).map(publicContribution);
 }
+
+export const listPendingContributions = () => listReviewContributions("pending");
 
 export async function getLeaderboard() {
   const db = await getDb();
