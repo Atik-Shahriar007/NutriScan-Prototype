@@ -1,8 +1,9 @@
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import React, { createContext, useContext, useEffect, useMemo, useState } from "react";
-import type { Category, Language } from "@/lib/nutriscan-data";
+import { productById } from "@/lib/nutriscan-data";
+import type { Category, Language, Product } from "@/lib/nutriscan-data";
 
-export type HistoryEntry = { productId: string; scannedAt: string };
+export type HistoryEntry = { id: string; productId: string; scannedAt: string; scanCount: number; productSnapshot?: Product };
 export type PrototypeSubmission = {
   id: string;
   contributorKey?: string;
@@ -58,7 +59,16 @@ export function NutriScanProvider({ children }: { children: React.ReactNode }) {
         try {
           const parsed = JSON.parse(value) as Partial<StoredState>;
           if (parsed.language === "en" || parsed.language === "bn") setLanguage(parsed.language);
-          if (Array.isArray(parsed.history)) setHistory(parsed.history);
+          if (Array.isArray(parsed.history)) {
+            setHistory(parsed.history
+              .map((entry, index) => ({
+                ...entry,
+                id: typeof entry.id === "string" ? entry.id : `history-legacy-${entry.productId}-${index}`,
+                scanCount: typeof entry.scanCount === "number" ? entry.scanCount : 1,
+                productSnapshot: entry.productSnapshot ?? productById(entry.productId),
+              }))
+              .filter((entry): entry is HistoryEntry & { productSnapshot: Product } => Boolean(entry.productSnapshot)));
+          }
           if (Array.isArray(parsed.submissions)) setSubmissions(parsed.submissions);
           if (typeof parsed.contributorKey === "string" && parsed.contributorKey.length >= 16) setContributorKey(parsed.contributorKey);
         } catch {
@@ -88,10 +98,18 @@ export function NutriScanProvider({ children }: { children: React.ReactNode }) {
       ready,
       setLanguage,
       recordScan: (productId) => {
-        setHistory((current) => [
-          { productId, scannedAt: new Date().toISOString() },
-          ...current.filter((entry) => entry.productId !== productId),
-        ].slice(0, 50));
+        const product = productById(productId);
+        if (!product) return;
+        setHistory((current) => {
+          const previous = current.find((entry) => entry.productId === productId);
+          return [{
+            id: previous?.id ?? `history-${Date.now()}-${productId}`,
+            productId,
+            scannedAt: new Date().toISOString(),
+            scanCount: (previous?.scanCount ?? 0) + 1,
+            productSnapshot: JSON.parse(JSON.stringify(product)) as Product,
+          }, ...current.filter((entry) => entry.productId !== productId)].slice(0, 50);
+        });
       },
       clearHistory: () => setHistory([]),
       addSubmission: (submission) => {

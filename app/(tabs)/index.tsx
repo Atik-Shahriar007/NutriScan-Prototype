@@ -9,7 +9,7 @@ import { useNutriScan } from "@/lib/nutriscan-state";
 
 export default function HomeScreen() {
   const router = useRouter();
-  const { language, recordScan } = useNutriScan();
+  const { language, history, recordScan } = useNutriScan();
   const [category, setCategory] = useState<Category>("food");
   const [barcode, setBarcode] = useState("");
   const [query, setQuery] = useState("");
@@ -63,6 +63,17 @@ export default function HomeScreen() {
           })}
         </View>
       </View>
+
+      {history.length ? <View style={{ gap: 8 }}>
+        <SectionHeading title={t(language, "recent")} action={t(language, "seeAll")} onAction={() => router.push("/(tabs)/history")} />
+        <Card style={{ paddingVertical: 2, paddingHorizontal: 14, gap: 0 }}>
+          {history.slice(0, 3).map((entry, index) => {
+            const product = entry.productSnapshot ?? products.find((item) => item.id === entry.productId);
+            if (!product) return null;
+            return <View key={entry.id}>{index ? <View style={{ height: 1, backgroundColor: palette.line }} /> : null}<ProductRow product={product} onPress={() => router.push({ pathname: "/product/[id]", params: { id: product.id, historyId: entry.id } })} aside={<View style={{ alignItems: "flex-end", gap: 2 }}><MaterialCommunityIcons name="chevron-right" size={18} color={palette.muted} />{entry.scanCount > 1 ? <AppText style={{ color: palette.green, fontSize: 9 }}>{entry.scanCount}×</AppText> : null}</View>} /></View>;
+          })}
+        </Card>
+      </View> : null}
 
       <View style={{ gap: 8 }}>
         <SectionHeading title={t(language, "sampleCatalog")} />

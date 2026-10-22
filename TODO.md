@@ -16,6 +16,8 @@
 ## 4. Scan history
 - [x] A History view lets users revisit previously scanned products and reopen their product details.
 - [x] History is saved locally on the device for the prototype and can be cleared; it is not synced to an account.
+- [x] Each scan history entry keeps a stable ID, latest scan time, repeat-scan count and a product snapshot so later catalog edits do not rewrite the record the user viewed.
+- [x] The home screen shows recent scans, and opening a record routes to product details with a visible history timestamp and history-source indicator.
 
 ## 5. Community contribution and review
 - [x] The contribution flow captures/selects front and back/package-label photos plus product name, brand, category and optional barcode, then saves a local prototype submission.
@@ -33,6 +35,6 @@
 - [x] Apply the approved **Delta Field Notes** direction: documentary/editorial warmth, paper tones, deep green accents, restrained amber, Bengali-capable typography, clear evidence cards, and spacious one-handed portrait layouts. The generated mark is used for the app identity, launcher and splash assets.
 
 ## Prototype boundary
-- The catalog, grade and evidence records remain fictional local sample data; contribution submission, image storage fallback, review states and accepted-points leaderboard endpoints are now connected, while the product catalog, live OCR, source-verification feed, account sync and payment integration remain unconnected.
+- The catalog, grade and evidence records remain fictional local sample data; contribution submission, image storage fallback, review states and accepted-points leaderboard endpoints are now connected, while the product catalog, live OCR, source-verification feed, account sync, cloud-synced history and payment integration remain unconnected.
 - The Expo Web Preview uses manual barcode/demo lookup; the native camera path is implemented but has not been verified on a physical device. This is a previewable prototype, not an installed or store-ready iOS/Android release.
 - **NutriScan** is a working name only; trademark, domain and app-store name clearance have not been performed.

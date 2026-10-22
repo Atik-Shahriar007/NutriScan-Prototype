@@ -7,17 +7,18 @@ import { useNutriScan } from "@/lib/nutriscan-state";
 
 export default function ProductDetailScreen() {
   const router = useRouter();
-  const { id } = useLocalSearchParams<{ id: string }>();
-  const { language } = useNutriScan();
-  const product = productById(typeof id === "string" ? id : undefined);
+  const { id, historyId } = useLocalSearchParams<{ id: string; historyId?: string }>();
+  const { language, history } = useNutriScan();
+  const historyEntry = typeof historyId === "string" ? history.find((entry) => entry.id === historyId) : undefined;
+  const product = historyEntry?.productSnapshot ?? productById(typeof id === "string" ? id : undefined);
   if (!product) return <Screen><PageHeader title={t(language, "productNotFound")} /><SecondaryButton title={language === "en" ? "Back" : "ফিরে যান"} onPress={() => router.back()} /></Screen>;
 
   return (
     <Screen contentStyle={{ gap: 16 }}>
       <View style={{ flexDirection: "row", alignItems: "center", gap: 10 }}>
         <Pressable accessibilityRole="button" accessibilityLabel={language === "en" ? "Go back" : "ফিরে যান"} onPress={() => router.back()} style={{ width: 38, height: 38, borderRadius: 13, backgroundColor: palette.card, borderWidth: 1, borderColor: palette.line, alignItems: "center", justifyContent: "center" }}><MaterialCommunityIcons name="arrow-left" size={20} color={palette.ink} /></Pressable>
-        <View style={{ flex: 1 }}><AppText weight="semibold" style={{ fontSize: 13 }}>{t(language, "productDetails")}</AppText><AppText style={{ color: palette.muted, fontSize: 10 }}>{categoryLabel(product.category, language)}</AppText></View>
-        <Pill tone="amber">{t(language, "sample")}</Pill>
+        <View style={{ flex: 1 }}><AppText weight="semibold" style={{ fontSize: 13 }}>{t(language, "productDetails")}</AppText><AppText style={{ color: palette.muted, fontSize: 10 }}>{categoryLabel(product.category, language)}</AppText>{historyEntry ? <AppText style={{ color: palette.muted, fontSize: 9 }}>{language === "en" ? `Scanned ${dateLabel(historyEntry.scannedAt, language)}` : `স্ক্যান: ${dateLabel(historyEntry.scannedAt, language)}`}</AppText> : null}</View>
+        <Pill tone={historyEntry ? "neutral" : "amber"}>{historyEntry ? (language === "en" ? "From history" : "ইতিহাস থেকে") : t(language, "sample")}</Pill>
       </View>
       <View style={{ gap: 7 }}>
         <AppText weight="bold" style={{ fontSize: 25, lineHeight: 34 }}>{productName(product, language)}</AppText>
@@ -75,4 +76,9 @@ export default function ProductDetailScreen() {
       <PrimaryButton title={t(language, "openScanner")} icon="barcode-scan" onPress={() => router.push("/scan")} />
     </Screen>
   );
+}
+
+function dateLabel(date: string, language: "en" | "bn") {
+  try { return new Intl.DateTimeFormat(language === "bn" ? "bn-BD" : "en-BD", { dateStyle: "medium", timeStyle: "short" }).format(new Date(date)); }
+  catch { return date; }
 }
