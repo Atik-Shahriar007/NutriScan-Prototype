@@ -2,6 +2,7 @@ import { and, desc, eq, sql } from "drizzle-orm";
 import { contributions, type InsertContribution } from "../drizzle/schema";
 import { getDb } from "./db";
 import { storagePut } from "./storage";
+import { createDraftCatalogRecord } from "./catalog";
 
 type Category = "food" | "personalCare" | "household";
 type ContributionStatus = "pending" | "accepted" | "rejected" | "needs-clearer-photo";
@@ -53,6 +54,7 @@ function publicContribution(row: MemoryContribution | Record<string, any>) {
     category: row.category as Category,
     frontImageUrl: row.frontImageUrl,
     backImageUrl: row.backImageUrl,
+    catalogProductId: row.catalogProductId ?? null,
     status: row.status as ContributionStatus,
     reviewNote: row.reviewNote ?? null,
     pointsAwarded: Number(row.pointsAwarded ?? 0),
@@ -99,6 +101,15 @@ export async function listContributions(contributorKey: string) {
   return memoryContributions.filter((row) => row.contributorKey === contributorKey).map(publicContribution);
 }
 
+export async function listPendingContributions() {
+  const db = await getDb();
+  if (db) {
+    const rows = await db.select().from(contributions).where(eq(contributions.status, "pending")).orderBy(desc(contributions.createdAt));
+    return rows.map(publicContribution);
+  }
+  return memoryContributions.filter((row) => row.status === "pending").map(publicContribution);
+}
+
 export async function getLeaderboard() {
   const db = await getDb();
   if (db) {
@@ -126,12 +137,24 @@ export async function reviewContribution(id: number, status: Exclude<Contributio
   const pointsAwarded = status === "accepted" ? 25 : 0;
   const db = await getDb();
   if (db) {
-    await db.update(contributions).set({ status, reviewNote: reviewNote?.trim() || null, pointsAwarded, reviewedAt: new Date() }).where(eq(contributions.id, id));
+    const existingRows = await db.select().from(contributions).where(eq(contributions.id, id)).limit(1);
+    const existing = existingRows[0];
+    if (!existing) return null;
+    let catalogProductId = existing.catalogProductId;
+    if (status === "accepted" && !catalogProductId) {
+      const draft = await createDraftCatalogRecord({ contributionId: id, productName: existing.productName, brand: existing.brand ?? undefined, barcode: existing.barcode ?? undefined, category: existing.category });
+      catalogProductId = draft.id;
+    }
+    await db.update(contributions).set({ status, reviewNote: reviewNote?.trim() || null, pointsAwarded, catalogProductId, reviewedAt: new Date() }).where(eq(contributions.id, id));
     const rows = await db.select().from(contributions).where(eq(contributions.id, id)).limit(1);
     return rows[0] ? publicContribution(rows[0]) : null;
   }
   const row = memoryContributions.find((item) => item.id === id);
   if (!row) return null;
+  if (status === "accepted" && !row.catalogProductId) {
+    const draft = await createDraftCatalogRecord({ contributionId: id, productName: row.productName, brand: row.brand ?? undefined, barcode: row.barcode ?? undefined, category: row.category });
+    row.catalogProductId = draft.id;
+  }
   row.status = status;
   row.reviewNote = reviewNote?.trim() || null;
   row.pointsAwarded = pointsAwarded;

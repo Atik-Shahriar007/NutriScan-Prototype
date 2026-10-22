@@ -1,0 +1,1 @@
+ALTER TABLE `contributions` ADD `catalogProductId` varchar(64);

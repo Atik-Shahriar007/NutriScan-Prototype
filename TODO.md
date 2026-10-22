@@ -26,6 +26,8 @@
 - [x] Contribution photos and metadata can be submitted through a typed backend endpoint, stored through project storage when configured, and retained in a local preview fallback when storage/database services are unavailable.
 - [x] Contributions have pending, accepted, rejected and clearer-photo-needed review states; accepted contributions award fixed review points and preserve review notes.
 - [x] The leaderboard reads only accepted contributions whose submitter opted into public display; points do not affect product grades, verification or search ranking.
+- [x] An admin-only moderation queue displays both package images and submission metadata, supports accept/reject/clearer-photo actions, and keeps accepted items out of the public catalog until enrichment and publication.
+- [x] Accepting a contribution creates or links a draft catalog record and never auto-publishes an unverified product.
 
 ## 6. Support Us
 - [x] Support Us describes voluntary operating support, what contributions could fund, and the potential Bangladesh payment methods.

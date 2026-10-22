@@ -22,6 +22,13 @@
       "when": 1792673074391,
       "tag": "0002_lame_shard",
       "breakpoints": true
+    },
+    {
+      "idx": 3,
+      "version": "5",
+      "when": 1792673906254,
+      "tag": "0003_curved_korvac",
+      "breakpoints": true
     }
   ]
 }

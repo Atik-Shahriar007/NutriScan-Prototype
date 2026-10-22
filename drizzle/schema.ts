@@ -38,6 +38,7 @@ export const contributions = mysqlTable(
     category: mysqlEnum("category", ["food", "personalCare", "household"]).notNull(),
     frontImageUrl: text("frontImageUrl").notNull(),
     backImageUrl: text("backImageUrl").notNull(),
+    catalogProductId: varchar("catalogProductId", { length: 64 }),
     status: mysqlEnum("status", ["pending", "accepted", "rejected", "needs-clearer-photo"]).default("pending").notNull(),
     reviewNote: text("reviewNote"),
     pointsAwarded: int("pointsAwarded").default(0).notNull(),

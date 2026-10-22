@@ -5,7 +5,7 @@ import {
 import { systemRouter } from "./_core/systemRouter";
 import { adminProcedure, publicProcedure, router } from "./_core/trpc";
 import { z } from "zod";
-import { createContribution, getLeaderboard, listContributions, reviewContribution } from "./contributions";
+import { createContribution, getLeaderboard, listContributions, listPendingContributions, reviewContribution } from "./contributions";
 import { getCatalogProduct, getCatalogProductByBarcode, listCatalog } from "./catalog";
 
 export const appRouter = router({
@@ -49,6 +49,7 @@ export const appRouter = router({
       .input(z.object({ contributorKey: z.string().min(16).max(80) }))
       .query(({ input }) => listContributions(input.contributorKey)),
     leaderboard: publicProcedure.query(() => getLeaderboard()),
+    pending: adminProcedure.query(() => listPendingContributions()),
     review: adminProcedure
       .input(z.object({
         id: z.number().int().positive(),
