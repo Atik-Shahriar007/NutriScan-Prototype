@@ -56,6 +56,9 @@ const publicRuntime = {
     process.env.EXPO_PUBLIC_APP_ID ??
     "",
   apiBaseUrl: process.env.EXPO_PUBLIC_API_BASE_URL ?? "",
+  donationUrl: process.env.EXPO_PUBLIC_DONATION_URL ?? "",
+  bkashDonationNumber: process.env.EXPO_PUBLIC_BKASH_DONATION_NUMBER ?? "",
+  nagadDonationNumber: process.env.EXPO_PUBLIC_NAGAD_DONATION_NUMBER ?? "",
 };
 
 const config: ExpoConfig = {

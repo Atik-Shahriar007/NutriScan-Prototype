@@ -30,6 +30,8 @@
 ## 6. Support Us
 - [x] Support Us describes voluntary operating support, what contributions could fund, and the potential Bangladesh payment methods.
 - [x] bKash/Nagad are clearly shown as **not configured**. No real donation account, checkout or charge is connected.
+- [x] Donation channels and an optional HTTPS donation page are environment-configurable; the UI never invents account numbers and keeps the no-charge state when values are absent.
+- [x] Configured support details show explicit Send Money guidance and warn users never to share card PINs, OTPs or passwords; unconfigured details remain disabled.
 
 ## 7. Approved NutriScan visual direction
 - [x] Apply the approved **Delta Field Notes** direction: documentary/editorial warmth, paper tones, deep green accents, restrained amber, Bengali-capable typography, clear evidence cards, and spacious one-handed portrait layouts. The generated mark is used for the app identity, launcher and splash assets.

@@ -1,13 +1,15 @@
 import { useState } from "react";
-import { Pressable, View } from "react-native";
+import { Linking, Pressable, View } from "react-native";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
-import { AppText, Card, DemoNotice, IconTile, PageHeader, Pill, Screen, SecondaryButton, palette } from "@/components/nutriscan-ui";
+import { AppText, Card, DemoNotice, IconTile, PageHeader, Pill, PrimaryButton, Screen, SecondaryButton, palette } from "@/components/nutriscan-ui";
 import { t } from "@/lib/nutriscan-data";
 import { useNutriScan } from "@/lib/nutriscan-state";
+import { configuredDonationChannels, supportConfig } from "@/lib/support-config";
 
 export default function SupportScreen() {
   const { language } = useNutriScan();
   const [showPurpose, setShowPurpose] = useState(true);
+  const [notice, setNotice] = useState("");
   const fundUses = [t(language, "fundsOne"), t(language, "fundsTwo"), t(language, "fundsThree")];
   return (
     <Screen contentStyle={{ gap: 18 }}>
@@ -21,12 +23,13 @@ export default function SupportScreen() {
         <AppText style={{ color: "#E6EEE8", fontSize: 12, lineHeight: 19 }}>{t(language, "supportBody")}</AppText>
       </Card>
       <Card style={{ gap: 12 }}>
-        <View style={{ flexDirection: "row", alignItems: "center", gap: 9 }}><IconTile icon="wallet-outline" tone="amber" /><View style={{ flex: 1 }}><AppText weight="semibold" style={{ fontSize: 15 }}>{language === "en" ? "Donation details" : "অনুদানের তথ্য"}</AppText><AppText style={{ color: palette.muted, fontSize: 10 }}>{language === "en" ? "Payment setup not connected" : "পেমেন্ট ব্যবস্থা যুক্ত নয়"}</AppText></View></View>
-        <View style={{ flexDirection: "row", gap: 8 }}>
-          {["bKash", "Nagad"].map((name) => <View key={name} style={{ flex: 1, minHeight: 49, borderRadius: 14, borderWidth: 1, borderColor: palette.line, backgroundColor: palette.paper, alignItems: "center", justifyContent: "center", gap: 2 }}><AppText weight="semibold" style={{ color: palette.green, fontSize: 13 }}>{name}</AppText><AppText style={{ color: palette.muted, fontSize: 9 }}>{language === "en" ? "not configured" : "যুক্ত নয়"}</AppText></View>)}
+        <View style={{ flexDirection: "row", alignItems: "center", gap: 9 }}><IconTile icon="wallet-outline" tone="amber" /><View style={{ flex: 1 }}><AppText weight="semibold" style={{ fontSize: 15 }}>{language === "en" ? "Donation details" : "অনুদানের তথ্য"}</AppText><AppText style={{ color: palette.muted, fontSize: 10 }}>{configuredDonationChannels.length || supportConfig.donationUrl ? (language === "en" ? "Ready when configured by the project owner" : "প্রকল্প মালিক সেটআপ করলে প্রস্তুত") : (language === "en" ? "Payment setup not connected" : "পেমেন্ট ব্যবস্থা যুক্ত নয়")}</AppText></View><Pill tone={configuredDonationChannels.length || supportConfig.donationUrl ? "green" : "neutral"}>{configuredDonationChannels.length || supportConfig.donationUrl ? (language === "en" ? "Ready" : "প্রস্তুত") : (language === "en" ? "Not configured" : "যুক্ত নয়")}</Pill></View>
+        <View style={{ gap: 8 }}>
+          {supportConfig.channels.map((channel) => <View key={channel.provider} style={{ borderRadius: 14, borderWidth: 1, borderColor: channel.account ? palette.green : palette.line, backgroundColor: channel.account ? palette.greenSoft : palette.paper, padding: 12, gap: 4 }}><View style={{ flexDirection: "row", alignItems: "center", justifyContent: "space-between" }}><AppText weight="semibold" style={{ color: palette.green, fontSize: 13 }}>{channel.provider}</AppText><Pill tone={channel.account ? "green" : "neutral"}>{channel.account ? (language === "en" ? "Configured" : "সেটআপ হয়েছে") : (language === "en" ? "Not configured" : "যুক্ত নয়")}</Pill></View>{channel.account ? <><AppText selectable style={{ color: palette.ink, fontSize: 14, letterSpacing: 0.5 }}>{channel.account}</AppText><AppText style={{ color: palette.muted, fontSize: 10 }}>{language === "en" ? "Send Money · Reference: NutriScan support" : "Send Money · রেফারেন্স: NutriScan support"}</AppText></> : <AppText style={{ color: palette.muted, fontSize: 10 }}>{language === "en" ? "An approved account number will appear here after configuration." : "অনুমোদিত অ্যাকাউন্ট নম্বর সেটআপের পর এখানে দেখা যাবে।"}</AppText>}</View>)}
         </View>
-        <View style={{ flexDirection: "row", alignItems: "flex-start", gap: 8, padding: 12, backgroundColor: palette.amberSoft, borderRadius: 13 }}><MaterialCommunityIcons name="information-outline" size={16} color="#805915" /><AppText style={{ color: "#6D5428", fontSize: 11, lineHeight: 17, flex: 1 }}>{t(language, "donationStatus")}</AppText></View>
-        <SecondaryButton title={language === "en" ? "Payment setup coming later" : "পেমেন্ট ব্যবস্থা পরে যুক্ত হবে"} icon="lock-outline" disabled style={{ backgroundColor: "#F1EFEA" }} />
+        {supportConfig.donationUrl ? <PrimaryButton title={language === "en" ? "Open secure donation page" : "নিরাপদ অনুদান পেজ খুলুন"} icon="open-in-new" onPress={() => { void Linking.openURL(supportConfig.donationUrl!).catch(() => setNotice(language === "en" ? "The donation page could not be opened." : "অনুদানের পেজ খোলা যায়নি।")); }} /> : <SecondaryButton title={language === "en" ? "Donation page not configured" : "অনুদানের পেজ যুক্ত নয়"} icon="lock-outline" disabled style={{ backgroundColor: "#F1EFEA" }} />}
+        <View style={{ flexDirection: "row", alignItems: "flex-start", gap: 8, padding: 12, backgroundColor: palette.amberSoft, borderRadius: 13 }}><MaterialCommunityIcons name="information-outline" size={16} color="#805915" /><AppText style={{ color: "#6D5428", fontSize: 11, lineHeight: 17, flex: 1 }}>{configuredDonationChannels.length || supportConfig.donationUrl ? (language === "en" ? "Only use the configured details above. NutriScan never asks for card PINs, OTPs, or passwords." : "উপরের সেটআপ করা তথ্যই ব্যবহার করুন। NutriScan কখনো কার্ডের PIN, OTP বা পাসওয়ার্ড চায় না।") : t(language, "donationStatus")}</AppText></View>
+        {notice ? <AppText style={{ color: palette.clay, fontSize: 11 }}>{notice}</AppText> : null}
       </Card>
       <Card style={{ gap: 12 }}>
         <Pressable accessibilityRole="button" accessibilityState={{ expanded: showPurpose }} onPress={() => setShowPurpose(!showPurpose)} style={{ flexDirection: "row", alignItems: "center", gap: 9 }}>
