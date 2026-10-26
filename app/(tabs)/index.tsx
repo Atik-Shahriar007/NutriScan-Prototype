@@ -1,11 +1,13 @@
 import { useEffect, useMemo, useState } from "react";
-import { Animated, Pressable, View } from "react-native";
+import { Animated, Image, Pressable, View } from "react-native";
 import { useRouter } from "expo-router";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { AppText, Card, DemoNotice, PageHeader, Pill, PrimaryButton, ProductRow, Screen, SectionHeading, usePalette } from "@/components/nutriscan-ui";
 import { filterProductsByHalal, products, t } from "@/lib/nutriscan-data";
 import type { Category } from "@/lib/nutriscan-data";
 import { useNutriScan } from "@/lib/nutriscan-state";
+
+const nutriScanMark = require("../../assets/images/nutriscan-mark.png");
 
 export default function HomeScreen() {
   const router = useRouter();
@@ -83,21 +85,14 @@ function BarcodeScanIllustration() {
     return () => animation.stop();
   }, [scanProgress]);
   const beamY = scanProgress.interpolate({ inputRange: [0, 1], outputRange: [-38, 38] });
-  const bars = [5, 2, 7, 3, 2, 6, 3, 2, 5, 2, 8, 3, 2, 6, 4, 2, 7, 3, 5];
+  const beamOpacity = scanProgress.interpolate({ inputRange: [0, 0.5, 1], outputRange: [0.62, 1, 0.62] });
   return (
-    <View accessible accessibilityLabel="Animated barcode scan illustration" style={{ width: 92, height: 94, borderRadius: 20, backgroundColor: palette.greenSoft, alignItems: "center", justifyContent: "center", overflow: "hidden" }}>
-      <View pointerEvents="none" style={{ position: "absolute", width: 61, height: 58, borderColor: palette.green, borderWidth: 1, opacity: 0.35 }} />
-      <View pointerEvents="none" style={{ position: "absolute", width: 67, height: 64 }}>
-        <View style={{ position: "absolute", top: 0, left: 0, width: 13, height: 11, borderTopWidth: 2, borderLeftWidth: 2, borderColor: palette.green, borderTopLeftRadius: 4 }} />
-        <View style={{ position: "absolute", top: 0, right: 0, width: 13, height: 11, borderTopWidth: 2, borderRightWidth: 2, borderColor: palette.green, borderTopRightRadius: 4 }} />
-        <View style={{ position: "absolute", bottom: 0, left: 0, width: 13, height: 11, borderBottomWidth: 2, borderLeftWidth: 2, borderColor: palette.green, borderBottomLeftRadius: 4 }} />
-        <View style={{ position: "absolute", bottom: 0, right: 0, width: 13, height: 11, borderBottomWidth: 2, borderRightWidth: 2, borderColor: palette.green, borderBottomRightRadius: 4 }} />
+    <View accessible accessibilityLabel="NutriScan mark with continuous scanning animation" style={{ width: 92, height: 94, borderRadius: 20, backgroundColor: palette.greenSoft, alignItems: "center", justifyContent: "center", overflow: "hidden" }}>
+      <View pointerEvents="none" style={{ width: 72, height: 72, borderRadius: 22, backgroundColor: palette.card, borderWidth: 1, borderColor: palette.line, alignItems: "center", justifyContent: "center", overflow: "hidden" }}>
+        <Image source={nutriScanMark} resizeMode="contain" style={{ width: 70, height: 70, borderRadius: 20 }} />
+        <Animated.View pointerEvents="none" style={{ position: "absolute", left: 7, right: 7, height: 2, backgroundColor: palette.green, shadowColor: palette.green, shadowOpacity: 0.95, shadowRadius: 7, opacity: beamOpacity, transform: [{ translateY: beamY }] }} />
       </View>
-      <View style={{ flexDirection: "row", alignItems: "center", height: 42, gap: 2 }}>
-        {bars.map((width, index) => <View key={`${width}-${index}`} style={{ width, height: index % 4 === 0 ? 45 : 38, backgroundColor: palette.ink, opacity: 0.86 }} />)}
-      </View>
-      <Animated.View pointerEvents="none" style={{ position: "absolute", left: 13, right: 13, height: 2, backgroundColor: palette.green, shadowColor: palette.green, shadowOpacity: 0.8, shadowRadius: 5, transform: [{ translateY: beamY }] }} />
-      <View style={{ position: "absolute", bottom: 9, flexDirection: "row", alignItems: "center", gap: 4 }}><MaterialCommunityIcons name="radar" size={11} color={palette.green} /><AppText weight="semibold" style={{ color: palette.green, fontSize: 8, letterSpacing: 0.5 }}>READY</AppText></View>
+      <View style={{ position: "absolute", bottom: 8, flexDirection: "row", alignItems: "center", gap: 4, paddingHorizontal: 7, paddingVertical: 3, borderRadius: 99, backgroundColor: palette.card, borderWidth: 1, borderColor: palette.line }}><MaterialCommunityIcons name="radar" size={10} color={palette.green} /><AppText weight="semibold" style={{ color: palette.green, fontSize: 7, letterSpacing: 0.45 }}>SCANNING</AppText></View>
     </View>
   );
 }
