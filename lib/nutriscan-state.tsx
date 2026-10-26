@@ -1,5 +1,5 @@
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import React, { createContext, useContext, useEffect, useMemo, useState } from "react";
+import React, { createContext, useCallback, useContext, useEffect, useMemo, useState } from "react";
 import type { Category, Language } from "@/lib/nutriscan-data";
 
 export type HistoryEntry = { productId: string; scannedAt: string };
@@ -98,6 +98,13 @@ export function NutriScanProvider({ children }: { children: React.ReactNode }) {
     AsyncStorage.setItem(STORAGE_KEY, JSON.stringify(payload)).catch(() => undefined);
   }, [language, history, submissions, favorites, appearance, halalMode, profile, productReactions, ready]);
 
+  const recordScan = useCallback((productId: string) => {
+    setHistory((current) => [
+      { productId, scannedAt: new Date().toISOString() },
+      ...current.filter((entry) => entry.productId !== productId),
+    ].slice(0, 50));
+  }, []);
+
   const value = useMemo<AppState>(
     () => ({
       language,
@@ -112,12 +119,7 @@ export function NutriScanProvider({ children }: { children: React.ReactNode }) {
       setAppearance,
       halalMode,
       setHalalMode,
-      recordScan: (productId) => {
-        setHistory((current) => [
-          { productId, scannedAt: new Date().toISOString() },
-          ...current.filter((entry) => entry.productId !== productId),
-        ].slice(0, 50));
-      },
+      recordScan,
       clearHistory: () => setHistory([]),
       addSubmission: (submission) => {
         setSubmissions((current) => [
@@ -145,7 +147,7 @@ export function NutriScanProvider({ children }: { children: React.ReactNode }) {
         });
       },
     }),
-    [language, history, submissions, favorites, appearance, halalMode, profile, productReactions, ready],
+    [language, history, submissions, favorites, appearance, halalMode, profile, productReactions, ready, recordScan],
   );
 
   return <AppStateContext.Provider value={value}>{children}</AppStateContext.Provider>;
