@@ -6,7 +6,7 @@ import type { ExpoConfig } from "expo/config";
 // e.g., "my-app" created at 2024-01-15 10:30:45 -> "space.manus.my.app.t20240115103045"
 // Bundle ID can only contain letters, numbers, and dots
 // Android requires each dot-separated segment to start with a letter
-const rawBundleId = "space.manus.nutriscan.t060816227356762";
+const rawBundleId = "space.manus.nutriscan.t040995209006095";
 const bundleId =
   rawBundleId
     .replace(/[-_]/g, ".") // Replace hyphens/underscores with dots
@@ -30,9 +30,8 @@ const env = {
   // App branding - update these values directly (do not use env vars)
   appName: "NutriScan",
   appSlug: "nutriscan",
-  // S3 URL of the app logo - set this to the URL returned by generate_image when creating custom logo
-  // Leave empty to use the default icon from assets/images/icon.png
-  logoUrl: "",
+  // Durable public project-logo asset matching the bundled launcher artwork.
+  logoUrl: "https://files.manuscdn.com/user_upload_by_module/session_file/310519663991779610/HglAOlDTpnmOppeT.png",
   scheme: schemeFromBundleId,
   iosBundleId: bundleId,
   androidPackage: bundleId,
@@ -77,7 +76,7 @@ const config: ExpoConfig = {
   },
   android: {
     adaptiveIcon: {
-      backgroundColor: "#E6F4FE",
+      backgroundColor: "#F6F3EA",
       foregroundImage: "./assets/images/android-icon-foreground.png",
       backgroundImage: "./assets/images/android-icon-background.png",
       monochromeImage: "./assets/images/android-icon-monochrome.png",
@@ -107,6 +106,8 @@ const config: ExpoConfig = {
   plugins: [
     "expo-asset",
     "expo-router",
+    ["expo-camera", { cameraPermission: "Allow NutriScan to scan product barcodes and photograph package labels." }],
+    ["expo-image-picker", { photosPermission: "Allow NutriScan to select package-label photos for a contribution." }],
     [
       "expo-audio",
       {
@@ -126,7 +127,7 @@ const config: ExpoConfig = {
         image: "./assets/images/splash-icon.png",
         imageWidth: 200,
         resizeMode: "contain",
-        backgroundColor: "#ffffff",
+        backgroundColor: "#F6F3EA",
         dark: {
           backgroundColor: "#000000",
         },

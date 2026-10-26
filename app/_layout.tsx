@@ -5,7 +5,15 @@ import { StatusBar } from "expo-status-bar";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 import "react-native-reanimated";
-import { Platform } from "react-native";
+import { Platform, View } from "react-native";
+import { useFonts } from "expo-font";
+import { MaterialCommunityIcons } from "@expo/vector-icons";
+import {
+  NotoSansBengali_400Regular,
+  NotoSansBengali_500Medium,
+  NotoSansBengali_600SemiBold,
+  NotoSansBengali_700Bold,
+} from "@expo-google-fonts/noto-sans-bengali";
 import "@/lib/_core/nativewind-pressable";
 import { ThemeProvider } from "@/lib/theme-provider";
 import {
@@ -15,105 +23,83 @@ import {
   initialWindowMetrics,
 } from "react-native-safe-area-context";
 import type { EdgeInsets, Metrics, Rect } from "react-native-safe-area-context";
-
 import { trpc, createTRPCClient } from "@/lib/trpc";
 import { initManusRuntime, subscribeSafeAreaInsets } from "@/lib/_core/manus-runtime";
+import { NutriScanProvider, useNutriScan } from "@/lib/nutriscan-state";
+import { usePalette } from "@/components/nutriscan-ui";
 
 const DEFAULT_WEB_INSETS: EdgeInsets = { top: 0, right: 0, bottom: 0, left: 0 };
 const DEFAULT_WEB_FRAME: Rect = { x: 0, y: 0, width: 0, height: 0 };
 
-export const unstable_settings = {
-  anchor: "(tabs)",
-};
+export const unstable_settings = { anchor: "(tabs)" };
+
+function AppNavigator() {
+  const { appearance } = useNutriScan();
+  const colors = usePalette();
+  return (
+    <View style={{ flex: 1, backgroundColor: colors.paper }}>
+      <Stack screenOptions={{ headerShown: false, contentStyle: { backgroundColor: colors.paper } }}>
+        <Stack.Screen name="(tabs)" />
+        <Stack.Screen name="scan" options={{ presentation: "modal" }} />
+        <Stack.Screen name="product/[id]" options={{ presentation: "card" }} />
+        <Stack.Screen name="oauth/callback" />
+      </Stack>
+      <StatusBar style={appearance === "dark" ? "light" : "dark"} />
+    </View>
+  );
+}
 
 export default function RootLayout() {
+  const [fontsLoaded] = useFonts({
+    ...MaterialCommunityIcons.font,
+    NotoSansBengali_400Regular,
+    NotoSansBengali_500Medium,
+    NotoSansBengali_600SemiBold,
+    NotoSansBengali_700Bold,
+  });
   const initialInsets = initialWindowMetrics?.insets ?? DEFAULT_WEB_INSETS;
   const initialFrame = initialWindowMetrics?.frame ?? DEFAULT_WEB_FRAME;
-
   const [insets, setInsets] = useState<EdgeInsets>(initialInsets);
   const [frame, setFrame] = useState<Rect>(initialFrame);
 
-  // Initialize Manus runtime for cookie injection from parent container
-  useEffect(() => {
-    initManusRuntime();
-  }, []);
-
+  useEffect(() => { initManusRuntime(); }, []);
   const handleSafeAreaUpdate = useCallback((metrics: Metrics) => {
     setInsets(metrics.insets);
     setFrame(metrics.frame);
   }, []);
-
   useEffect(() => {
     if (Platform.OS !== "web") return;
     const unsubscribe = subscribeSafeAreaInsets(handleSafeAreaUpdate);
     return () => unsubscribe();
   }, [handleSafeAreaUpdate]);
 
-  // Create clients once and reuse them
-  const [queryClient] = useState(
-    () =>
-      new QueryClient({
-        defaultOptions: {
-          queries: {
-            // Disable automatic refetching on window focus for mobile
-            refetchOnWindowFocus: false,
-            // Retry failed requests once
-            retry: 1,
-          },
-        },
-      }),
-  );
+  const [queryClient] = useState(() => new QueryClient({ defaultOptions: { queries: { refetchOnWindowFocus: false, retry: 1 } } }));
   const [trpcClient] = useState(() => createTRPCClient());
-
-  // Ensure minimum 8px padding for top and bottom on mobile
   const providerInitialMetrics = useMemo(() => {
     const metrics = initialWindowMetrics ?? { insets: initialInsets, frame: initialFrame };
-    return {
-      ...metrics,
-      insets: {
-        ...metrics.insets,
-        top: Math.max(metrics.insets.top, 16),
-        bottom: Math.max(metrics.insets.bottom, 12),
-      },
-    };
+    return { ...metrics, insets: { ...metrics.insets, top: Math.max(metrics.insets.top, 16), bottom: Math.max(metrics.insets.bottom, 12) } };
   }, [initialInsets, initialFrame]);
 
+  if (!fontsLoaded) return null;
   const content = (
     <GestureHandlerRootView style={{ flex: 1 }}>
       <trpc.Provider client={trpcClient} queryClient={queryClient}>
         <QueryClientProvider client={queryClient}>
-          {/* Default to hiding native headers so raw route segments don't appear (e.g. "(tabs)", "products/[id]"). */}
-          {/* If a screen needs the native header, explicitly enable it and set a human title via Stack.Screen options. */}
-          {/* in order for ios apps tab switching to work properly, use presentation: "fullScreenModal" for login page, whenever you decide to use presentation: "modal*/}
-          <Stack screenOptions={{ headerShown: false }}>
-            <Stack.Screen name="(tabs)" />
-            <Stack.Screen name="oauth/callback" />
-          </Stack>
-          <StatusBar style="auto" />
+          <NutriScanProvider><AppNavigator /></NutriScanProvider>
         </QueryClientProvider>
       </trpc.Provider>
     </GestureHandlerRootView>
   );
-
-  const shouldOverrideSafeArea = Platform.OS === "web";
-
-  if (shouldOverrideSafeArea) {
+  if (Platform.OS === "web") {
     return (
       <ThemeProvider>
         <SafeAreaProvider initialMetrics={providerInitialMetrics}>
           <SafeAreaFrameContext.Provider value={frame}>
-            <SafeAreaInsetsContext.Provider value={insets}>
-              {content}
-            </SafeAreaInsetsContext.Provider>
+            <SafeAreaInsetsContext.Provider value={insets}>{content}</SafeAreaInsetsContext.Provider>
           </SafeAreaFrameContext.Provider>
         </SafeAreaProvider>
       </ThemeProvider>
     );
   }
-
-  return (
-    <ThemeProvider>
-      <SafeAreaProvider initialMetrics={providerInitialMetrics}>{content}</SafeAreaProvider>
-    </ThemeProvider>
-  );
+  return <ThemeProvider><SafeAreaProvider initialMetrics={providerInitialMetrics}>{content}</SafeAreaProvider></ThemeProvider>;
 }
