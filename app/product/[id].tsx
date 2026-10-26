@@ -93,7 +93,6 @@ export default function ProductDetailScreen() {
           <Pill tone="amber">{t(language, "sample")}</Pill>
         </View>
       </Card>
-      <DemoNotice>{t(language, "demoProductCaveat")}</DemoNotice>
       {product.halalEvidence ? <Card style={{ flexDirection: "row", alignItems: "flex-start", gap: 10, backgroundColor: palette.greenSoft, borderColor: palette.line }}>
         <MaterialCommunityIcons name="shield-check-outline" size={21} color={palette.green} />
         <View style={{ flex: 1, gap: 4 }}><AppText weight="semibold" style={{ fontSize: 12 }}>{t(language, "halalEvidenceLabel")}</AppText><AppText style={{ color: palette.muted, fontSize: 10, lineHeight: 15 }}>{product.halalEvidence.label[language]}</AppText><AppText style={{ color: palette.green, fontSize: 9 }}>{product.halalEvidence.sourceTitle}</AppText></View>
