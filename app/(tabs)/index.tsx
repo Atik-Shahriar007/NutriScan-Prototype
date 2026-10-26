@@ -79,7 +79,11 @@ function BarcodeScanIllustration() {
   const [scanProgress] = useState(() => new Animated.Value(0));
   useEffect(() => {
     const animation = Animated.loop(
-      Animated.timing(scanProgress, { toValue: 1, duration: 1800, useNativeDriver: true }),
+      Animated.sequence([
+        Animated.timing(scanProgress, { toValue: 1, duration: 850, useNativeDriver: true, isInteraction: false }),
+        Animated.delay(500),
+        Animated.timing(scanProgress, { toValue: 0, duration: 1, useNativeDriver: true, isInteraction: false }),
+      ]),
     );
     animation.start();
     return () => animation.stop();
