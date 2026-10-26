@@ -1,7 +1,6 @@
 import React, { useMemo } from "react";
 import {
   Image,
-  Platform,
   Pressable,
   ScrollView,
   StyleSheet,
@@ -19,6 +18,8 @@ import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { categoryLabel, productBrand, productName, t } from "@/lib/nutriscan-data";
 import type { Language, Product } from "@/lib/nutriscan-data";
 import { useNutriScan } from "@/lib/nutriscan-state";
+
+const nutriScanMark = require("../assets/images/nutriscan-mark.png");
 
 export type Palette = {
   paper: string;
@@ -164,9 +165,7 @@ export function PageHeader({ title, subtitle, right, back }: { title: string; su
       <View style={styles.brandRow}>
         {back ? <Pressable accessibilityRole="button" accessibilityLabel={language === "en" ? "Go back" : "ফিরে যান"} onPress={back} style={styles.backButton}><MaterialCommunityIcons name="arrow-left" size={19} color={colors.ink} /></Pressable> : null}
         <View style={styles.brandMark}>
-          {Platform.OS === "web" ? <Image source={{ uri: "/manus-storage/async-images/jZqB1d32vvPRkkJMnKCiin/image-1.webp" }} resizeMode="cover" style={styles.brandImage} /> : null}
-          <MaterialCommunityIcons name="barcode-scan" size={22} color={colors.green} />
-          <View style={styles.leafDot} />
+          <Image source={nutriScanMark} resizeMode="cover" style={styles.brandImage} />
         </View>
         <View style={{ flex: 1, minWidth: 44 }}>
           <AppText weight="bold" style={{ fontSize: 18, letterSpacing: 0.2 }}>{t(language, "brand")}</AppText>

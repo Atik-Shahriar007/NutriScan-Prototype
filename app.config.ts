@@ -31,7 +31,7 @@ const env = {
   appName: "NutriScan",
   appSlug: "nutriscan",
   // Durable public project-logo asset matching the bundled launcher artwork.
-  logoUrl: "https://files.manuscdn.com/user_upload_by_module/session_file/310519663991779610/HglAOlDTpnmOppeT.png",
+  logoUrl: "https://files.manuscdn.com/user_upload_by_module/session_file/310519664045562648/hSvtozJWHqCiEHFJ.png",
   scheme: schemeFromBundleId,
   iosBundleId: bundleId,
   androidPackage: bundleId,
