@@ -1,6 +1,7 @@
 import { View } from "react-native";
+import { useRouter } from "expo-router";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
-import { AppText, Card, DemoNotice, IconTile, PageHeader, Pill, Screen, usePalette } from "@/components/nutriscan-ui";
+import { AppText, Card, DemoNotice, IconTile, PageHeader, Pill, PrimaryButton, Screen, usePalette } from "@/components/nutriscan-ui";
 import { t } from "@/lib/nutriscan-data";
 import { useNutriScan } from "@/lib/nutriscan-state";
 
@@ -12,6 +13,7 @@ const sampleContributors = [
 ];
 
 export default function CommunityScreen() {
+  const router = useRouter();
   const palette = usePalette();
   const { language, submissions } = useNutriScan();
   const ranks = language === "bn" ? ["১ম", "২য়", "৩য়", "৪র্থ"] : ["01", "02", "03", "04"];
@@ -33,10 +35,11 @@ export default function CommunityScreen() {
       </Card>
       <Card style={{ backgroundColor: palette.greenSoft, borderColor: palette.line }}>
         <View style={{ flexDirection: "row", alignItems: "center", gap: 8 }}><MaterialCommunityIcons name="account-check-outline" size={18} color={palette.green} /><AppText weight="semibold" style={{ color: palette.green, fontSize: 13 }}>{t(language, "yourPoints")}</AppText></View>
-        <View style={{ flexDirection: "row", alignItems: "baseline", gap: 6 }}><AppText weight="bold" style={{ color: palette.green, fontSize: 32 }}>0</AppText><AppText style={{ color: palette.green, fontSize: 12 }}>{language === "en" ? "accepted points" : "গৃহীত পয়েন্ট"}</AppText></View>
+        <View style={{ flexDirection: "row", alignItems: "baseline", gap: 6 }}><AppText weight="bold" style={{ color: palette.green, fontSize: 32 }}>—</AppText><AppText style={{ color: palette.green, fontSize: 12 }}>{language === "en" ? "accepted points unavailable" : "গৃহীত পয়েন্ট উপলভ্য নয়"}</AppText></View>
         <AppText style={{ color: palette.green, fontSize: 11, lineHeight: 17 }}>{t(language, "pointsAfterReview")}</AppText>
         <AppText style={{ color: palette.green, fontSize: 10 }}>{language === "en" ? `${submissions.length} local prototype submission${submissions.length === 1 ? "" : "s"}; none has been reviewed.` : `প্রোটোটাইপে ${submissions.length}টি তথ্য জমা; কোনোটি পর্যালোচনা করা হয়নি।`}</AppText>
       </Card>
+      <PrimaryButton title={language === "en" ? "Save a local contribution draft" : "স্থানীয় অবদানের ড্রাফট সংরক্ষণ করুন"} icon="camera-plus-outline" onPress={() => router.push("/(tabs)/contribute")} />
       <Card style={{ flexDirection: "row", gap: 12, alignItems: "flex-start" }}>
         <IconTile icon="shield-check-outline" />
         <View style={{ flex: 1, gap: 5 }}><AppText weight="semibold" style={{ fontSize: 13 }}>{language === "en" ? "Recognition, not influence" : "স্বীকৃতি, প্রভাব নয়"}</AppText><AppText style={{ color: palette.muted, fontSize: 11, lineHeight: 18 }}>{language === "en" ? "Points celebrate useful approved label data. They never change a product grade, verification status, or search ranking." : "গৃহীত ও উপকারী লেবেল তথ্যের জন্য পয়েন্ট। এগুলো পণ্যের গ্রেড, যাচাইয়ের অবস্থা বা সার্চের ক্রম বদলায় না।"}</AppText></View>

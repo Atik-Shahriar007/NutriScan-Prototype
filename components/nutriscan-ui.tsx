@@ -163,18 +163,18 @@ export function PageHeader({ title, subtitle, right, back }: { title: string; su
   return (
     <View style={styles.header}>
       <View style={styles.brandRow}>
-        {back ? <Pressable accessibilityRole="button" accessibilityLabel={language === "en" ? "Go back" : "ফিরে যান"} onPress={back} style={styles.backButton}><MaterialCommunityIcons name="arrow-left" size={19} color={colors.ink} /></Pressable> : null}
+        {back ? <Pressable accessibilityRole="button" accessibilityLabel={language === "en" ? "Go back" : "ফিরে যান"} onPress={back} hitSlop={6} style={({ pressed }) => [styles.backButton, { opacity: pressed ? 0.72 : 1 }]}><MaterialCommunityIcons name="arrow-left" size={19} color={colors.ink} /></Pressable> : null}
         <View style={styles.brandMark}>
           <Image source={nutriScanMark} resizeMode="cover" style={styles.brandImage} />
         </View>
         <View style={{ flex: 1, minWidth: 44 }}>
           <AppText weight="bold" style={{ fontSize: 18, letterSpacing: 0.2 }}>{t(language, "brand")}</AppText>
-          <AppText numberOfLines={1} style={{ color: colors.muted, fontSize: 9 }}>{t(language, "tagline")}</AppText>
+          <AppText style={{ color: colors.muted, fontSize: 9 }}>{t(language, "tagline")}</AppText>
         </View>
-        <Pressable accessibilityRole="button" accessibilityLabel={language === "en" ? "Switch language" : "ভাষা পরিবর্তন করুন"} onPress={() => setLanguage(language === "en" ? "bn" : "en")} style={styles.languageToggle}>
+        <Pressable accessibilityRole="button" accessibilityLabel={language === "en" ? "Switch language" : "ভাষা পরিবর্তন করুন"} onPress={() => setLanguage(language === "en" ? "bn" : "en")} hitSlop={6} style={({ pressed }) => [styles.languageToggle, { opacity: pressed ? 0.72 : 1 }]}>
           <AppText weight="semibold" style={{ fontSize: 11, color: colors.green }}>{language === "en" ? "বাংলা" : "EN"}</AppText>
         </Pressable>
-        <Pressable accessibilityRole="button" accessibilityLabel={themeLabel} accessibilityState={{ selected: appearance === "dark" }} onPress={() => setAppearance(nextAppearance)} style={styles.smallHeaderButton}>
+        <Pressable accessibilityRole="button" accessibilityLabel={themeLabel} accessibilityState={{ selected: appearance === "dark" }} onPress={() => setAppearance(nextAppearance)} hitSlop={6} style={({ pressed }) => [styles.smallHeaderButton, { opacity: pressed ? 0.72 : 1 }]}>
           <MaterialCommunityIcons name={appearance === "dark" ? "weather-sunny" : "weather-night"} size={18} color={colors.green} />
         </Pressable>
         {right}
@@ -193,7 +193,7 @@ export function SectionHeading({ title, action, onAction }: { title: string; act
   return (
     <View style={styles.sectionHeading}>
       <AppText weight="semibold" style={{ fontSize: 16, flex: 1 }}>{title}</AppText>
-      {action && onAction ? <Pressable accessibilityRole="button" onPress={onAction} hitSlop={8}><AppText weight="semibold" style={{ color: colors.green, fontSize: 12 }}>{action}</AppText></Pressable> : null}
+      {action && onAction ? <Pressable accessibilityRole="button" accessibilityLabel={action} onPress={onAction} hitSlop={6} style={({ pressed }) => ({ minHeight: 44, paddingHorizontal: 8, alignItems: "center", justifyContent: "center", opacity: pressed ? 0.68 : 1 })}><AppText weight="semibold" style={{ color: colors.green, fontSize: 12 }}>{action}</AppText></Pressable> : null}
     </View>
   );
 }
@@ -219,7 +219,7 @@ export function PrimaryButton({ title, onPress, icon, disabled, style, ...props 
   const colors = usePalette();
   const styles = useUiStyles();
   return (
-    <Pressable accessibilityRole="button" onPress={onPress} disabled={disabled} style={({ pressed }) => [styles.primaryButton, { opacity: disabled ? 0.5 : pressed ? 0.86 : 1 }, style]} {...props}>
+    <Pressable accessibilityRole="button" accessibilityState={{ disabled: Boolean(disabled) }} onPress={onPress} disabled={disabled} style={({ pressed }) => [styles.primaryButton, { opacity: disabled ? 0.5 : pressed ? 0.86 : 1 }, style]} {...props}>
       {icon ? <MaterialCommunityIcons name={icon} size={18} color={colors.onGreen} /> : null}
       <AppText weight="semibold" style={{ color: colors.onGreen, fontSize: 14 }}>{title}</AppText>
     </Pressable>
@@ -230,7 +230,7 @@ export function SecondaryButton({ title, onPress, icon, style, ...props }: Omit<
   const colors = usePalette();
   const styles = useUiStyles();
   return (
-    <Pressable accessibilityRole="button" onPress={onPress} style={({ pressed }) => [styles.secondaryButton, { opacity: pressed ? 0.84 : 1 }, style]} {...props}>
+    <Pressable accessibilityRole="button" accessibilityState={{ disabled: Boolean(props.disabled) }} onPress={onPress} style={({ pressed }) => [styles.secondaryButton, { opacity: props.disabled ? 0.5 : pressed ? 0.84 : 1 }, style]} {...props}>
       {icon ? <MaterialCommunityIcons name={icon} size={17} color={colors.green} /> : null}
       <AppText weight="semibold" style={{ color: colors.green, fontSize: 13 }}>{title}</AppText>
     </Pressable>
@@ -246,8 +246,8 @@ export function ProductRow({ product, onPress, aside }: { product: Product; onPr
     <Pressable accessibilityRole="button" accessibilityLabel={`${productName(product, language)}, ${productBrand(product, language)}`} onPress={onPress} style={({ pressed }) => [styles.productRow, { opacity: pressed ? 0.86 : 1 }]}>
       <View style={[styles.productPhotoFrame, { backgroundColor: tint }]}><Image source={product.image} resizeMode="contain" style={styles.productPhoto} /></View>
       <View style={{ flex: 1, gap: 3 }}>
-        <AppText weight="semibold" numberOfLines={1} style={{ fontSize: 13 }}>{productName(product, language)}</AppText>
-        <AppText numberOfLines={1} style={{ color: colors.muted, fontSize: 10 }}>{productBrand(product, language)} · {categoryLabel(product.category, language)}</AppText>
+        <AppText weight="semibold" numberOfLines={2} style={{ fontSize: 13, lineHeight: 18 }}>{productName(product, language)}</AppText>
+        <AppText style={{ color: colors.muted, fontSize: 10, lineHeight: 15 }}>{productBrand(product, language)} · {categoryLabel(product.category, language)}</AppText>
       </View>
       {aside ?? <MaterialCommunityIcons name="chevron-right" size={20} color={colors.muted} />}
     </Pressable>

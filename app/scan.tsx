@@ -19,6 +19,7 @@ export default function ScanScreen() {
   const [notFoundCode, setNotFoundCode] = useState("");
   const [halalBlockedCode, setHalalBlockedCode] = useState("");
   const [permissionMessage, setPermissionMessage] = useState("");
+  const [inputMessage, setInputMessage] = useState("");
 
   useEffect(() => {
     // The scanner route can be revisited with a new barcode while mounted.
@@ -28,7 +29,11 @@ export default function ScanScreen() {
 
   const openCode = (raw: string) => {
     const code = normalizeBarcode(raw);
-    if (!code) return;
+    if (!code) {
+      setInputMessage(language === "en" ? "Enter the barcode digits from the package." : "প্যাকেটের বারকোডের অঙ্কগুলো লিখুন।");
+      return;
+    }
+    setInputMessage("");
     const product = productByBarcode(code);
     if (product) {
       if (halalMode && !isHalalEligible(product)) {
@@ -73,9 +78,10 @@ export default function ScanScreen() {
       <Card style={{ gap: 10 }}>
         <AppText weight="semibold" style={{ fontSize: 13 }}>{t(language, "enterBarcode")}</AppText>
         <View style={{ flexDirection: "row", gap: 8 }}>
-          <TextInput value={barcode} onChangeText={(value) => { setBarcode(value); setNotFoundCode(""); setHalalBlockedCode(""); }} placeholder={t(language, "barcodePlaceholder")} placeholderTextColor={palette.muted} keyboardType="number-pad" onSubmitEditing={() => openCode(barcode)} accessibilityLabel={t(language, "enterBarcode")} style={{ flex: 1, minHeight: 48, borderRadius: 13, backgroundColor: palette.paper, borderWidth: 1, borderColor: palette.line, paddingHorizontal: 13, color: palette.ink, fontFamily: fontFamily(language), fontSize: 13 }} />
-          <Pressable accessibilityRole="button" onPress={() => openCode(barcode)} style={{ paddingHorizontal: 15, borderRadius: 13, backgroundColor: palette.green, alignItems: "center", justifyContent: "center" }}><AppText weight="semibold" style={{ color: palette.white, fontSize: 12 }}>{t(language, "findProduct")}</AppText></Pressable>
+          <TextInput value={barcode} onChangeText={(value) => { setBarcode(value); setNotFoundCode(""); setHalalBlockedCode(""); setInputMessage(""); }} placeholder={t(language, "barcodePlaceholder")} placeholderTextColor={palette.muted} keyboardType="number-pad" onSubmitEditing={() => openCode(barcode)} accessibilityLabel={t(language, "enterBarcode")} accessibilityHint={language === "en" ? "Enter digits from a product barcode" : "পণ্যের বারকোডের অঙ্ক লিখুন"} style={{ flex: 1, minHeight: 48, borderRadius: 13, backgroundColor: palette.paper, borderWidth: 1, borderColor: inputMessage ? palette.clay : palette.line, paddingHorizontal: 13, color: palette.ink, fontFamily: fontFamily(language), fontSize: 13 }} />
+          <Pressable accessibilityRole="button" accessibilityLabel={t(language, "findProduct")} accessibilityHint={language === "en" ? "Search the prototype catalog" : "প্রোটোটাইপ ক্যাটালগে খুঁজুন"} onPress={() => openCode(barcode)} style={({ pressed }) => ({ minHeight: 48, paddingHorizontal: 15, borderRadius: 13, backgroundColor: palette.green, alignItems: "center", justifyContent: "center", opacity: pressed ? 0.82 : 1 })}><AppText weight="semibold" style={{ color: palette.white, fontSize: 12 }}>{t(language, "findProduct")}</AppText></Pressable>
         </View>
+        {inputMessage ? <AppText accessibilityLiveRegion="polite" style={{ color: palette.clay, fontSize: 11, lineHeight: 16 }}>{inputMessage}</AppText> : null}
       </Card>
 
       {notFoundCode ? <Card style={{ borderColor: palette.line, backgroundColor: palette.claySoft }}>
@@ -83,6 +89,7 @@ export default function ScanScreen() {
         <AppText weight="semibold" style={{ fontSize: 15 }}>{notFoundCode}</AppText>
         <AppText style={{ color: palette.muted, fontSize: 12, lineHeight: 18 }}>{t(language, "unknownBarcodeBody")}</AppText>
         <PrimaryButton title={t(language, "sendForReview")} icon="camera-plus-outline" onPress={openContribution} />
+        <SecondaryButton title={language === "en" ? "Try another barcode" : "অন্য বারকোড চেষ্টা করুন"} icon="refresh" onPress={() => { setBarcode(""); setNotFoundCode(""); }} />
       </Card> : null}
 
       {halalBlockedCode ? <Card style={{ borderColor: palette.line, backgroundColor: palette.amberSoft, gap: 9 }}>

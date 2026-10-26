@@ -22,7 +22,7 @@ export default function HistoryScreen() {
       <DemoNotice>{language === "en" ? "History is stored on this device for the prototype; it is not synced to an account." : "প্রোটোটাইপে ইতিহাস এই ডিভাইসে সংরক্ষিত; কোনো অ্যাকাউন্টে সিঙ্ক হয় না।"}</DemoNotice>
       {entries.length > 0 ? (
         <View style={{ gap: 12 }}>
-          <SecondaryButton title={t(language, "clearHistory")} icon="delete-outline" onPress={() => setConfirmClear(true)} style={{ alignSelf: "flex-end", minHeight: 38, paddingHorizontal: 12 }} />
+          <SecondaryButton accessibilityLabel={t(language, "clearHistory")} title={t(language, "clearHistory")} icon="delete-outline" onPress={() => setConfirmClear(true)} style={{ alignSelf: "flex-end", minHeight: 44, paddingHorizontal: 12 }} />
           {confirmClear ? <Card style={{ gap: 10, backgroundColor: palette.claySoft, borderColor: palette.line }}>
             <AppText weight="semibold" style={{ fontSize: 13 }}>{language === "en" ? "Clear all scan history?" : "সব স্ক্যানের ইতিহাস মুছবেন?"}</AppText>
             <AppText style={{ color: palette.muted, fontSize: 11, lineHeight: 16 }}>{language === "en" ? "This removes the saved history from this device only." : "এতে শুধু এই ডিভাইসে সংরক্ষিত ইতিহাস মুছে যাবে।"}</AppText>
@@ -50,6 +50,7 @@ export default function HistoryScreen() {
           <View style={{ width: 54, height: 54, borderRadius: 20, backgroundColor: palette.greenSoft, alignItems: "center", justifyContent: "center" }}><MaterialCommunityIcons name="history" size={26} color={palette.green} /></View>
           <AppText weight="semibold" style={{ fontSize: 16, textAlign: "center" }}>{t(language, "emptyHistory")}</AppText>
           <AppText style={{ color: palette.muted, fontSize: 12, textAlign: "center", lineHeight: 19 }}>{t(language, "emptyHistoryBody")}</AppText>
+          <PrimaryButton title={language === "en" ? "Scan a product" : "পণ্য স্ক্যান করুন"} icon="barcode-scan" onPress={() => router.push("/scan")} style={{ alignSelf: "stretch", marginTop: 6 }} />
         </Card>
       )}
     </Screen>

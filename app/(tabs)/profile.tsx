@@ -41,10 +41,10 @@ export default function ProfileScreen() {
       </Card>
       <Card style={{ gap: 10 }}>
         <AppText weight="semibold" style={{ fontSize: 14 }}>{t(language, "myProfile")}</AppText>
-        <View style={{ gap: 6 }}><AppText weight="semibold" style={{ fontSize: 11 }}>{t(language, "displayName")}</AppText><TextInput value={displayName} onChangeText={(value) => { setDisplayName(value); setSaved(false); }} placeholder={t(language, "displayNamePlaceholder")} placeholderTextColor={palette.muted} maxLength={40} editable={ready} accessibilityLabel={t(language, "displayName")} style={fieldStyle} /></View>
-        <View style={{ gap: 6 }}><AppText weight="semibold" style={{ fontSize: 11 }}>{t(language, "district")}</AppText><TextInput value={district} onChangeText={(value) => { setDistrict(value); setSaved(false); }} placeholder={t(language, "districtPlaceholder")} placeholderTextColor={palette.muted} maxLength={50} editable={ready} accessibilityLabel={t(language, "district")} style={fieldStyle} /></View>
+        <View style={{ gap: 6 }}><AppText weight="semibold" style={{ fontSize: 11 }}>{t(language, "displayName")}</AppText><TextInput value={displayName} onChangeText={(value) => { setDisplayName(value); setSaved(false); }} placeholder={t(language, "displayNamePlaceholder")} placeholderTextColor={palette.muted} maxLength={40} editable={ready} accessibilityLabel={t(language, "displayName")} returnKeyType="next" onSubmitEditing={() => undefined} style={fieldStyle} /></View>
+        <View style={{ gap: 6 }}><AppText weight="semibold" style={{ fontSize: 11 }}>{t(language, "district")}</AppText><TextInput value={district} onChangeText={(value) => { setDistrict(value); setSaved(false); }} placeholder={t(language, "districtPlaceholder")} placeholderTextColor={palette.muted} maxLength={50} editable={ready} accessibilityLabel={t(language, "district")} returnKeyType="done" onSubmitEditing={save} style={fieldStyle} /></View>
         <PrimaryButton title={t(language, "saveProfile")} icon="content-save-outline" onPress={save} disabled={!ready} />
-        {saved ? <View style={{ flexDirection: "row", alignItems: "center", gap: 7 }}><MaterialCommunityIcons name="check-circle-outline" size={17} color={palette.green} /><AppText style={{ color: palette.green, fontSize: 11 }}>{t(language, "profileSaved")}</AppText></View> : null}
+        {saved ? <View accessibilityLiveRegion="polite" style={{ flexDirection: "row", alignItems: "center", gap: 7 }}><MaterialCommunityIcons name="check-circle-outline" size={17} color={palette.green} /><AppText style={{ color: palette.green, fontSize: 11 }}>{t(language, "profileSaved")}</AppText></View> : null}
       </Card>
       <DemoNotice>{t(language, "profilePrivacy")}</DemoNotice>
     </Screen>

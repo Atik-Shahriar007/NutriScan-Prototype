@@ -5,7 +5,7 @@ import { StatusBar } from "expo-status-bar";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 import "react-native-reanimated";
-import { Platform, View } from "react-native";
+import { ActivityIndicator, Image, Platform, View } from "react-native";
 import { useFonts } from "expo-font";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import {
@@ -26,16 +26,25 @@ import type { EdgeInsets, Metrics, Rect } from "react-native-safe-area-context";
 import { trpc, createTRPCClient } from "@/lib/trpc";
 import { initManusRuntime, subscribeSafeAreaInsets } from "@/lib/_core/manus-runtime";
 import { NutriScanProvider, useNutriScan } from "@/lib/nutriscan-state";
-import { usePalette } from "@/components/nutriscan-ui";
+import { AppText, usePalette } from "@/components/nutriscan-ui";
 
 const DEFAULT_WEB_INSETS: EdgeInsets = { top: 0, right: 0, bottom: 0, left: 0 };
 const DEFAULT_WEB_FRAME: Rect = { x: 0, y: 0, width: 0, height: 0 };
+const nutriScanMark = require("../assets/images/nutriscan-mark.png");
 
 export const unstable_settings = { anchor: "(tabs)" };
 
 function AppNavigator() {
-  const { appearance } = useNutriScan();
+  const { appearance, language, ready } = useNutriScan();
   const colors = usePalette();
+  if (!ready) {
+    return <View style={{ flex: 1, backgroundColor: colors.paper, alignItems: "center", justifyContent: "center", padding: 32, gap: 14 }}>
+      <View style={{ width: 82, height: 82, borderRadius: 26, backgroundColor: colors.card, borderWidth: 1, borderColor: colors.line, alignItems: "center", justifyContent: "center" }}><Image source={nutriScanMark} resizeMode="contain" style={{ width: 76, height: 76, borderRadius: 22 }} /></View>
+      <AppText weight="bold" style={{ fontSize: 19 }}>{language === "en" ? "Preparing your shelf" : "আপনার শেলফ প্রস্তুত হচ্ছে"}</AppText>
+      <AppText style={{ color: colors.muted, fontSize: 12, textAlign: "center", lineHeight: 19 }}>{language === "en" ? "Loading your on-device preferences…" : "আপনার ডিভাইসের পছন্দগুলো লোড হচ্ছে…"}</AppText>
+      <ActivityIndicator color={colors.green} />
+    </View>;
+  }
   return (
     <View style={{ flex: 1, backgroundColor: colors.paper }}>
       <Stack screenOptions={{ headerShown: false, contentStyle: { backgroundColor: colors.paper } }}>

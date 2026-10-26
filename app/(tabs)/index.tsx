@@ -2,7 +2,7 @@ import { useEffect, useMemo, useState } from "react";
 import { Animated, Image, Pressable, View } from "react-native";
 import { useRouter } from "expo-router";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
-import { AppText, Card, DemoNotice, PageHeader, Pill, PrimaryButton, ProductRow, Screen, SectionHeading, usePalette } from "@/components/nutriscan-ui";
+import { AppText, Card, DemoNotice, PageHeader, Pill, PrimaryButton, ProductRow, Screen, SectionHeading, SecondaryButton, usePalette } from "@/components/nutriscan-ui";
 import { filterProductsByHalal, products, t } from "@/lib/nutriscan-data";
 import type { Category } from "@/lib/nutriscan-data";
 import { useNutriScan } from "@/lib/nutriscan-state";
@@ -52,9 +52,10 @@ export default function HomeScreen() {
           {categories.map((category) => {
             const item = categoryStyles[category];
             const count = visibleProducts.filter((product) => product.category === category).length;
-            return <Pressable key={category} accessibilityRole="button" onPress={() => router.push({ pathname: "/(tabs)/discover", params: { category } })} style={({ pressed }) => [{ flex: 1, minHeight: 104, borderRadius: 18, padding: 10, backgroundColor: palette.card, borderColor: palette.line, borderWidth: 1, justifyContent: "space-between", opacity: pressed ? 0.88 : 1 }]}>
+            const label = category === "food" ? t(language, "food") : category === "personalCare" ? t(language, "personalCare") : t(language, "household");
+            return <Pressable key={category} accessibilityRole="button" accessibilityLabel={label} accessibilityHint={language === "en" ? `Browse ${label}` : `${label} দেখুন`} onPress={() => router.push({ pathname: "/(tabs)/discover", params: { category } })} style={({ pressed }) => [{ flex: 1, minHeight: 104, borderRadius: 18, padding: 10, backgroundColor: palette.card, borderColor: palette.line, borderWidth: 1, justifyContent: "space-between", opacity: pressed ? 0.88 : 1 }]}>
               <View style={{ width: 35, height: 35, borderRadius: 12, backgroundColor: item.tint, alignItems: "center", justifyContent: "center" }}><MaterialCommunityIcons name={item.icon} size={19} color={palette.green} /></View>
-              <View style={{ gap: 3 }}><AppText weight="semibold" numberOfLines={1} style={{ fontSize: 10 }}>{category === "food" ? t(language, "food") : category === "personalCare" ? t(language, "personalCare") : t(language, "household")}</AppText><AppText style={{ color: palette.muted, fontSize: 9 }}>{count} {language === "en" ? "products" : "পণ্য"}</AppText></View>
+              <View style={{ gap: 3 }}><AppText weight="semibold" style={{ fontSize: 10 }}>{label}</AppText><AppText style={{ color: palette.muted, fontSize: 9 }}>{count} {language === "en" ? "products" : "পণ্য"}</AppText></View>
             </Pressable>;
           })}
         </View>
@@ -66,7 +67,7 @@ export default function HomeScreen() {
           {featuredProducts.length ? featuredProducts.map((product, index) => <View key={product.id}>
             {index > 0 ? <View style={{ height: 1, backgroundColor: palette.line }} /> : null}
             <ProductRow product={product} onPress={() => openProduct(product.id)} aside={<MaterialCommunityIcons name="chevron-right" size={20} color={palette.muted} />} />
-          </View>) : <View style={{ alignItems: "center", paddingVertical: 22, gap: 7 }}><MaterialCommunityIcons name="shield-off-outline" size={25} color={palette.muted} /><AppText weight="semibold" style={{ fontSize: 12 }}>{t(language, "halalEmptyTitle")}</AppText><AppText style={{ color: palette.muted, fontSize: 10, textAlign: "center" }}>{t(language, "halalEmptyBody")}</AppText></View>}
+          </View>) : <View style={{ alignItems: "center", paddingVertical: 22, gap: 7 }}><MaterialCommunityIcons name="shield-off-outline" size={25} color={palette.muted} /><AppText weight="semibold" style={{ fontSize: 12 }}>{t(language, "halalEmptyTitle")}</AppText><AppText style={{ color: palette.muted, fontSize: 10, textAlign: "center" }}>{t(language, "halalEmptyBody")}</AppText><SecondaryButton title={t(language, "turnOffHalalMode")} icon="shield-off-outline" onPress={() => router.push("/(tabs)/more")} style={{ alignSelf: "stretch", marginTop: 4 }} /></View>}
         </Card>
       </View>
       <DemoNotice>{t(language, "demoProductCaveat")}</DemoNotice>

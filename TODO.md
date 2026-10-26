@@ -64,3 +64,12 @@
 - The Expo Web Preview uses manual barcode/demo lookup; native camera behavior has not been verified on a physical device.
 - Package photographs are product-recognition references, not evidence of every product fact or commercial image rights. Clear reuse rights before distribution.
 - NutriScan is a working name; trademark, domain and app-store clearance have not been performed.
+
+
+## 13. App-wide UX refinement
+- [x] Prevent first-paint flashes of the wrong persisted language, theme, Halal filter, history, favorites, profile or reaction state by showing a branded localized hydration state until local state is ready.
+- [x] Give shared header controls, section actions, filter chips, clear actions, navigation rows and form segments an effective minimum 44px touch target, localized accessible labels, disabled/selected semantics and visible pressed feedback without changing the Delta Field Notes identity.
+- [x] Improve Discover recovery with a clear-search action for ordinary no-match results, larger filter/clear targets and detail-oriented accessible product-card labels.
+- [x] Improve History, Scanner and Contribute first-use flows with a useful empty-state CTA, explicit empty/manual-input validation, retry/rescan recovery, clearer disabled-form requirements and larger bilingual category controls.
+- [x] Improve Product Detail, Support, Community and NutriFacts action hierarchy and disclosure/source accessibility without inventing backend, payment, account or live-community behavior.
+- [ ] Preserve English/Bangla wrapping, light/dark contrast, prototype caveats and local-only boundaries across every refined route; validate TypeScript, tests, lint and live preview routes before marking this outcome complete. TypeScript, the project `pnpm lint` command, tests and live light-theme preview routes pass; a raw repository-wide ESLint sweep still reports pre-existing errors in `hooks/use-auth.ts` and `hooks/use-color-scheme.web.ts`, and a full Bengali/dark-theme route pass remains open.

@@ -10,7 +10,7 @@ import { useNutriScan } from "@/lib/nutriscan-state";
 function SourceLink({ title, url }: { title: string; url: string }) {
   const palette = usePalette();
   const { language } = useNutriScan();
-  return <Pressable accessibilityRole="link" onPress={() => { void Linking.openURL(url); }} style={{ minHeight: 30, flexDirection: "row", alignItems: "center", gap: 6, alignSelf: "flex-start" }}><MaterialCommunityIcons name="open-in-new" size={14} color={palette.green} /><AppText weight="semibold" style={{ color: palette.green, fontSize: 10 }}>{t(language, "readSource")}: {title}</AppText></Pressable>;
+  return <Pressable accessibilityRole="link" accessibilityLabel={`${t(language, "readSource")}: ${title}`} onPress={() => { void Linking.openURL(url); }} style={({ pressed }) => ({ minHeight: 44, paddingHorizontal: 6, marginHorizontal: -6, flexDirection: "row", alignItems: "center", gap: 6, alignSelf: "flex-start", opacity: pressed ? 0.7 : 1 })}><MaterialCommunityIcons name="open-in-new" size={15} color={palette.green} /><AppText weight="semibold" style={{ color: palette.green, fontSize: 12 }}>{t(language, "readSource")}: {title}</AppText></Pressable>;
 }
 
 function FactCard({ item, icon }: { item: SourcedFact; icon: "white-balance-sunny" | "flask-outline" | "check-decagram-outline" | "lightbulb-outline" }) {

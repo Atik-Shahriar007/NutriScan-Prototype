@@ -30,7 +30,7 @@ export default function SupportScreen() {
         <SecondaryButton title={language === "en" ? "Payment setup coming later" : "পেমেন্ট ব্যবস্থা পরে যুক্ত হবে"} icon="lock-outline" disabled style={{ backgroundColor: palette.neutralSoft }} />
       </Card>
       <Card style={{ gap: 12 }}>
-        <Pressable accessibilityRole="button" accessibilityState={{ expanded: showPurpose }} onPress={() => setShowPurpose(!showPurpose)} style={{ flexDirection: "row", alignItems: "center", gap: 9 }}>
+        <Pressable accessibilityRole="button" accessibilityLabel={t(language, "howFundsHelp")} accessibilityHint={language === "en" ? "Show or hide how support would be used" : "সহায়তা কীভাবে ব্যবহার হবে তা দেখান বা লুকান"} accessibilityState={{ expanded: showPurpose }} onPress={() => setShowPurpose(!showPurpose)} hitSlop={4} style={({ pressed }) => ({ minHeight: 44, flexDirection: "row", alignItems: "center", gap: 9, opacity: pressed ? 0.76 : 1 })}>
           <IconTile icon="text-box-check-outline" />
           <AppText weight="semibold" style={{ flex: 1, fontSize: 14 }}>{t(language, "howFundsHelp")}</AppText>
           <MaterialCommunityIcons name={showPurpose ? "chevron-up" : "chevron-down"} size={19} color={palette.muted} />

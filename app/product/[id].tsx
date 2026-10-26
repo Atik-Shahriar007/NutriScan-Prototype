@@ -11,7 +11,7 @@ function NutritionRow({ item, expanded, onPress, language }: { item: NutritionIt
   const palette = usePalette();
   const toneColor = item.tone === "positive" ? palette.green : item.tone === "caution" ? palette.clay : palette.amber;
   return (
-    <Pressable accessibilityRole="button" accessibilityState={{ expanded }} onPress={onPress} style={({ pressed }) => [{ paddingVertical: 13, borderTopWidth: 1, borderTopColor: palette.line, opacity: pressed ? 0.88 : 1 }]}>
+    <Pressable accessibilityRole="button" accessibilityLabel={`${item.label[language]}, ${item.amount[language]}`} accessibilityHint={language === "en" ? "Double tap to show explanation" : "ব্যাখ্যা দেখতে দুবার ট্যাপ করুন"} accessibilityState={{ expanded }} onPress={onPress} hitSlop={4} style={({ pressed }) => [{ paddingVertical: 13, borderTopWidth: 1, borderTopColor: palette.line, opacity: pressed ? 0.88 : 1 }]}>
       <View style={{ flexDirection: "row", alignItems: "center", gap: 11 }}>
         <MaterialCommunityIcons name={item.icon} size={20} color={palette.muted} />
         <View style={{ flex: 1, gap: 3 }}><AppText weight="semibold" style={{ fontSize: 13 }}>{item.label[language]}</AppText><AppText style={{ color: palette.muted, fontSize: 10 }}>{item.note[language]}</AppText></View>
@@ -31,7 +31,7 @@ function ReactionButtons({ baseLikes, baseDislikes, reaction, onReact }: { baseL
   const dislikes = baseDislikes + (reaction === "dislike" ? 1 : 0);
   const button = (vote: "like" | "dislike", count: number, icon: "thumb-up-outline" | "thumb-down-outline", label: string) => {
     const selected = reaction === vote;
-    return <Pressable key={vote} accessibilityRole="button" accessibilityLabel={`${label} ${count}`} accessibilityState={{ selected }} onPress={() => onReact(vote)} style={{ minHeight: 38, flex: 1, borderRadius: 12, borderWidth: 1, borderColor: selected ? (vote === "like" ? palette.green : palette.clay) : palette.line, backgroundColor: selected ? (vote === "like" ? palette.greenSoft : palette.claySoft) : palette.card, flexDirection: "row", alignItems: "center", justifyContent: "center", gap: 6, paddingHorizontal: 7 }}>
+    return <Pressable key={vote} accessibilityRole="button" accessibilityLabel={`${label} ${count}`} accessibilityState={{ selected }} onPress={() => onReact(vote)} style={({ pressed }) => ({ minHeight: 44, flex: 1, borderRadius: 12, borderWidth: 1, borderColor: selected ? (vote === "like" ? palette.green : palette.clay) : palette.line, backgroundColor: selected ? (vote === "like" ? palette.greenSoft : palette.claySoft) : palette.card, flexDirection: "row", alignItems: "center", justifyContent: "center", gap: 6, paddingHorizontal: 7, opacity: pressed ? 0.78 : 1 })}>
       <MaterialCommunityIcons name={icon} size={16} color={selected ? (vote === "like" ? palette.green : palette.clay) : palette.muted} />
       <AppText weight="semibold" style={{ color: selected ? (vote === "like" ? palette.green : palette.clay) : palette.ink, fontSize: 11 }}>{count.toLocaleString(language === "bn" ? "bn-BD" : "en-US")} {label}</AppText>
     </Pressable>;
@@ -77,7 +77,7 @@ export default function ProductDetailScreen() {
   return (
     <Screen contentStyle={{ gap: 16 }}>
       <PageHeader title={t(language, "productDetails")} subtitle={categoryLabel(product.category, language)} back={() => router.back()} right={
-        <Pressable accessibilityRole="button" accessibilityLabel={isFavorite ? t(language, "removeFavorite") : t(language, "addFavorite")} accessibilityState={{ selected: isFavorite }} onPress={() => toggleFavorite(product.id)} style={{ width: 34, height: 34, borderRadius: 12, backgroundColor: palette.card, borderWidth: 1, borderColor: palette.line, alignItems: "center", justifyContent: "center" }}>
+        <Pressable accessibilityRole="button" accessibilityLabel={isFavorite ? t(language, "removeFavorite") : t(language, "addFavorite")} accessibilityState={{ selected: isFavorite }} onPress={() => toggleFavorite(product.id)} hitSlop={6} style={({ pressed }) => ({ width: 34, height: 34, borderRadius: 12, backgroundColor: palette.card, borderWidth: 1, borderColor: palette.line, alignItems: "center", justifyContent: "center", opacity: pressed ? 0.72 : 1 })}>
           <MaterialCommunityIcons name={isFavorite ? "star" : "star-outline"} size={19} color={isFavorite ? palette.amber : palette.green} />
         </Pressable>
       } />
@@ -132,7 +132,7 @@ export default function ProductDetailScreen() {
           <Card style={{ paddingHorizontal: 13, paddingVertical: 1, gap: 0 }}>{other.map((item) => <NutritionRow key={item.label.en} item={item} language={language} expanded={expandedRows.includes(item.label.en)} onPress={() => toggleExpanded(item.label.en)} />)}</Card>
         </View> : null}
         <Card style={{ gap: 10 }}>
-          <Pressable accessibilityRole="button" accessibilityState={{ expanded: expandedRows.includes("score-method") }} onPress={() => toggleExpanded("score-method")} style={{ flexDirection: "row", alignItems: "center", gap: 8 }}>
+          <Pressable accessibilityRole="button" accessibilityLabel={t(language, "scoreBreakdown")} accessibilityState={{ expanded: expandedRows.includes("score-method") }} onPress={() => toggleExpanded("score-method")} hitSlop={4} style={({ pressed }) => ({ minHeight: 44, flexDirection: "row", alignItems: "center", gap: 8, opacity: pressed ? 0.76 : 1 })}>
             <MaterialCommunityIcons name="chart-box-outline" size={19} color={palette.green} /><AppText weight="semibold" style={{ flex: 1, fontSize: 12 }}>{t(language, "scoreBreakdown")}</AppText><MaterialCommunityIcons name={expandedRows.includes("score-method") ? "chevron-up" : "chevron-down"} size={18} color={palette.muted} />
           </Pressable>
           {expandedRows.includes("score-method") ? <View style={{ gap: 10 }}>
@@ -167,12 +167,12 @@ export default function ProductDetailScreen() {
       </View> : null}
 
       <Card style={{ gap: 0, paddingHorizontal: 13, paddingVertical: 2 }}>
-        <Pressable accessibilityRole="button" accessibilityState={{ selected: isFavorite }} onPress={() => toggleFavorite(product.id)} style={{ minHeight: 48, flexDirection: "row", alignItems: "center", gap: 11 }}>
+        <Pressable accessibilityRole="button" accessibilityLabel={isFavorite ? t(language, "removeFavorite") : t(language, "addFavorite")} accessibilityState={{ selected: isFavorite }} onPress={() => toggleFavorite(product.id)} style={({ pressed }) => ({ minHeight: 48, flexDirection: "row", alignItems: "center", gap: 11, opacity: pressed ? 0.76 : 1 })}>
           <MaterialCommunityIcons name={isFavorite ? "star" : "star-outline"} size={20} color={isFavorite ? palette.amber : palette.green} /><AppText weight="medium" style={{ flex: 1, fontSize: 12 }}>{isFavorite ? t(language, "removeFavorite") : t(language, "addFavorite")}</AppText><MaterialCommunityIcons name="chevron-right" size={18} color={palette.muted} />
         </Pressable>
         {product.category === "food" ? <>
           <View style={{ height: 1, backgroundColor: palette.line }} />
-          <Pressable accessibilityRole="button" accessibilityState={{ expanded: showPreferencesNote }} onPress={() => setShowPreferencesNote((value) => !value)} style={{ minHeight: 48, flexDirection: "row", alignItems: "center", gap: 11 }}>
+          <Pressable accessibilityRole="button" accessibilityLabel={t(language, "viewFoodPreferences")} accessibilityState={{ expanded: showPreferencesNote }} onPress={() => setShowPreferencesNote((value) => !value)} style={({ pressed }) => ({ minHeight: 48, flexDirection: "row", alignItems: "center", gap: 11, opacity: pressed ? 0.76 : 1 })}>
             <MaterialCommunityIcons name="tune-variant" size={20} color={palette.green} /><AppText weight="medium" style={{ flex: 1, fontSize: 12 }}>{t(language, "viewFoodPreferences")}</AppText><MaterialCommunityIcons name={showPreferencesNote ? "chevron-up" : "chevron-right"} size={18} color={palette.muted} />
           </Pressable>
           {showPreferencesNote ? <DemoNotice>{t(language, "foodPreferencesNote")}</DemoNotice> : null}
