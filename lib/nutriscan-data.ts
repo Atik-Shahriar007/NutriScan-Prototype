@@ -284,6 +284,73 @@ export const products: Product[] = [
     ], evidence: evidenceHome(), reactionCounts: { likes: 82, dislikes: 7 },
   },
 
+  {
+    id: "lux-soft-touch-soap", barcode: "9000000000210", category: "personalCare",
+    name: sample("Lux Soft Touch Beauty Soap", "লাক্স সফট টাচ বিউটি সোপ"), brand: sample("Lux", "লাক্স"), size: sample("100 g", "১০০ গ্রাম"),
+    description: sample("A familiar Bangladesh-market beauty-soap example. This prototype keeps personal-care evidence separate from food scoring.", "বাংলাদেশের বাজারের পরিচিত বিউটি-সাবানের উদাহরণ। এই প্রোটোটাইপে পার্সোনাল-কেয়ারের তথ্য খাবারের স্কোর থেকে আলাদা রাখা হয়েছে।"), image: require("../assets/images/products/generated/lux-soft-touch-soap.webp") as ImageSourcePropType,
+    ingredients: [sample("Cleansing base", "ক্লিনজিং বেস"), sample("Fragrance", "সুগন্ধি"), sample("Moisturizing ingredients", "ময়েশ্চারাইজিং উপাদান")], ingredientExplanations: [sample("Check the current package for the exact formulation.", "সঠিক ফর্মুলার জন্য বর্তমান প্যাকেট দেখুন।"), sample("Fragrance materials vary by variant.", "ভ্যারিয়েন্ট অনুযায়ী সুগন্ধির উপাদান বদলাতে পারে।"), sample("Personal suitability varies by skin and product variant.", "ত্বক ও পণ্যের ভ্যারিয়েন্ট অনুযায়ী ব্যক্তিগত উপযোগিতা ভিন্ন হতে পারে।")],
+    demo: true, gradeLabel: sample("Evidence summary only", "শুধু তথ্যের সারাংশ"), factors: [
+      { label: sample("Ingredient disclosure", "উপাদানের তথ্য"), value: null, note: sample("Read the exact package label.", "সঠিক প্যাকেটের লেবেল পড়ুন।") },
+      { label: sample("Variant / scent", "ভ্যারিয়েন্ট / সুগন্ধ"), value: null, note: sample("Personal suitability varies by product and person.", "পণ্য ও ব্যক্তিভেদে ব্যক্তিগত উপযোগিতা ভিন্ন হতে পারে।") },
+      { label: sample("Evidence quality", "তথ্যের নির্ভরযোগ্যতা"), value: null, note: sample("No independent product-specific record is linked.", "স্বাধীন পণ্যভিত্তিক কোনো রেকর্ড যুক্ত নেই।") },
+    ], evidence: evidenceCare(), reactionCounts: { likes: 96, dislikes: 8 },
+  },
+  {
+    id: "sunsilk-black-shine", barcode: "9000000000211", category: "personalCare",
+    name: sample("Sunsilk Black Shine Shampoo", "সানসিল্ক ব্ল্যাক শাইন শ্যাম্পু"), brand: sample("Sunsilk", "সানসিল্ক"), size: sample("180 ml", "১৮০ মি.লি."),
+    description: sample("A Bangladesh-market shampoo example for label-first product exploration; it is not a hair-health assessment.", "লেবেল-ভিত্তিক পণ্য বোঝার জন্য বাংলাদেশের বাজারের শ্যাম্পুর উদাহরণ; এটি চুলের স্বাস্থ্যের মূল্যায়ন নয়।"), image: require("../assets/images/products/generated/sunsilk-black-shine.webp") as ImageSourcePropType,
+    ingredients: [sample("Aqua", "পানি"), sample("Cleansing agents", "পরিষ্কারক উপাদান"), sample("Fragrance", "সুগন্ধি"), sample("Conditioning ingredients", "কন্ডিশনিং উপাদান")], ingredientExplanations: [sample("The full INCI list is printed on the current package.", "সম্পূর্ণ INCI তালিকা বর্তমান প্যাকেটে ছাপা থাকে।"), sample("Cleansing ingredients remove oil and residue; formulations vary.", "পরিষ্কারক উপাদান তেল ও অবশিষ্টাংশ দূর করে; ফর্মুলা ভিন্ন হতে পারে।"), sample("Check the label if fragrance sensitivity matters to you.", "সুগন্ধিতে সংবেদনশীলতা থাকলে লেবেল দেখুন।"), sample("Follow the package directions for use.", "ব্যবহারের জন্য প্যাকেটের নির্দেশনা অনুসরণ করুন।")],
+    demo: true, gradeLabel: sample("Evidence summary only", "শুধু তথ্যের সারাংশ"), factors: [
+      { label: sample("Ingredient disclosure", "উপাদানের তথ্য"), value: null, note: sample("Read the current product label.", "বর্তমান পণ্যের লেবেল পড়ুন।") },
+      { label: sample("Use directions", "ব্যবহারের নির্দেশনা"), value: null, note: sample("Follow the exact package directions.", "সঠিক প্যাকেটের নির্দেশনা অনুসরণ করুন।") },
+      { label: sample("Verification", "যাচাই"), value: null, note: sample("No independent product-specific record is linked.", "স্বাধীন পণ্যভিত্তিক কোনো রেকর্ড যুক্ত নেই।") },
+    ], evidence: evidenceCare(), reactionCounts: { likes: 79, dislikes: 7 },
+  },
+  {
+    id: "dettol-original-handwash", barcode: "9000000000212", category: "personalCare",
+    name: sample("Dettol Original Handwash", "ডেটল অরিজিনাল হ্যান্ডওয়াশ"), brand: sample("Dettol", "ডেটল"), size: sample("200 ml", "২০০ মি.লি."),
+    description: sample("A Bangladesh-market handwash example. Read the label and follow the product directions; this preview is not a medical or germ-protection claim.", "বাংলাদেশের বাজারের হ্যান্ডওয়াশের উদাহরণ। লেবেল পড়ে পণ্যের নির্দেশনা অনুসরণ করুন; এই প্রিভিউ চিকিৎসা বা জীবাণু-সুরক্ষার দাবি নয়।"), image: require("../assets/images/products/generated/dettol-original-handwash.webp") as ImageSourcePropType,
+    ingredients: [sample("Aqua", "পানি"), sample("Cleansing agents", "পরিষ্কারক উপাদান"), sample("Fragrance", "সুগন্ধি")], ingredientExplanations: [sample("Check the current bottle for the exact ingredient list.", "সঠিক উপাদান তালিকার জন্য বর্তমান বোতল দেখুন।"), sample("Use the product according to its label directions.", "লেবেলের নির্দেশনা অনুযায়ী পণ্য ব্যবহার করুন।"), sample("Variant fragrance and ingredients can differ.", "ভ্যারিয়েন্ট অনুযায়ী সুগন্ধি ও উপাদান ভিন্ন হতে পারে।")],
+    demo: true, gradeLabel: sample("Use-label summary only", "শুধু ব্যবহার-লেবেলের সারাংশ"), factors: [
+      { label: sample("Directions for use", "ব্যবহারের নির্দেশনা"), value: null, note: sample("Follow the instructions on the current bottle.", "বর্তমান বোতলের নির্দেশনা অনুসরণ করুন।") },
+      { label: sample("Precaution text", "সতর্কতার লেখা"), value: null, note: sample("Keep the product away from eyes and follow package precautions.", "চোখ থেকে দূরে রাখুন এবং প্যাকেটের সতর্কতা অনুসরণ করুন।") },
+      { label: sample("Verification", "যাচাই"), value: null, note: sample("No independent product-specific record is linked.", "স্বাধীন পণ্যভিত্তিক কোনো রেকর্ড যুক্ত নেই।") },
+    ], evidence: evidenceCare(), reactionCounts: { likes: 88, dislikes: 10 },
+  },
+  {
+    id: "rin-power-bright", barcode: "9000000000213", category: "household",
+    name: sample("Rin Power Bright Detergent", "রিন পাওয়ার ব্রাইট ডিটারজেন্ট"), brand: sample("Rin", "রিন"), size: sample("500 g", "৫০০ গ্রাম"),
+    description: sample("A Bangladesh-market laundry-care example. Its result focuses on label use and precautions, not nutrition or health grading.", "বাংলাদেশের বাজারের কাপড় ধোয়ার পণ্যের উদাহরণ। এর ফলাফল ব্যবহার ও সতর্কতার লেবেলে কেন্দ্রীভূত, পুষ্টি বা স্বাস্থ্য-গ্রেডে নয়।"), image: require("../assets/images/products/generated/rin-power-bright.webp") as ImageSourcePropType,
+    ingredients: [sample("Surfactant blend", "সার্ফ্যাক্ট্যান্ট মিশ্রণ"), sample("Builders", "বিল্ডার"), sample("Fragrance", "সুগন্ধি")], ingredientExplanations: [sample("The full formulation is available on the current pack.", "সম্পূর্ণ ফর্মুলা বর্তমান প্যাকেটে থাকে।"), sample("Follow the package directions for dose and fabric type.", "মাত্রা ও কাপড়ের ধরন অনুযায়ী প্যাকেটের নির্দেশনা অনুসরণ করুন।"), sample("Fragrance materials vary by product variant.", "পণ্যের ভ্যারিয়েন্ট অনুযায়ী সুগন্ধির উপাদান ভিন্ন হতে পারে।")],
+    demo: true, gradeLabel: sample("Use-label summary only", "শুধু ব্যবহার-লেবেলের সারাংশ"), factors: [
+      { label: sample("Directions for use", "ব্যবহারের নির্দেশনা"), value: null, note: sample("Read the dose and fabric instructions on the pack.", "প্যাকেটে মাত্রা ও কাপড়ের নির্দেশনা পড়ুন।") },
+      { label: sample("Precaution text", "সতর্কতার লেখা"), value: null, note: sample("Follow the product safety information.", "পণ্যের নিরাপত্তা-তথ্য অনুসরণ করুন।") },
+      { label: sample("Verification", "যাচাই"), value: null, note: sample("No independent product-specific record is linked.", "স্বাধীন পণ্যভিত্তিক কোনো রেকর্ড যুক্ত নেই।") },
+    ], evidence: evidenceHome(), reactionCounts: { likes: 74, dislikes: 6 },
+  },
+  {
+    id: "harpic-power-plus", barcode: "9000000000214", category: "household",
+    name: sample("Harpic Power Plus Toilet Cleaner", "হারপিক পাওয়ার প্লাস টয়লেট ক্লিনার"), brand: sample("Harpic", "হারপিক"), size: sample("500 ml", "৫০০ মি.লি."),
+    description: sample("A Bangladesh-market bathroom-care example. Always follow the exact bottle label and never mix cleaning chemicals.", "বাংলাদেশের বাজারের বাথরুম-কেয়ার পণ্যের উদাহরণ। বোতলের নির্দেশনা অনুসরণ করুন এবং কখনো পরিষ্কারক রাসায়নিক মেশাবেন না।"), image: require("../assets/images/products/generated/harpic-power-plus.webp") as ImageSourcePropType,
+    ingredients: [sample("Cleaning agents", "পরিষ্কারক উপাদান"), sample("Acidic cleaning formula", "অ্যাসিডিক ক্লিনিং ফর্মুলা"), sample("Fragrance", "সুগন্ধি")], ingredientExplanations: [sample("Read the bottle label for the complete formulation and handling information.", "সম্পূর্ণ ফর্মুলা ও ব্যবহারের তথ্যের জন্য বোতলের লেবেল পড়ুন।"), sample("Do not mix with bleach or other cleaning products.", "ব্লিচ বা অন্য পরিষ্কারকের সঙ্গে মেশাবেন না।"), sample("Follow the package precaution text.", "প্যাকেটের সতর্কতার লেখা অনুসরণ করুন।")],
+    demo: true, gradeLabel: sample("Use-label summary only", "শুধু ব্যবহার-লেবেলের সারাংশ"), factors: [
+      { label: sample("Directions for use", "ব্যবহারের নির্দেশনা"), value: null, note: sample("Use only as directed on the current bottle.", "বর্তমান বোতলের নির্দেশনা অনুযায়ী ব্যবহার করুন।") },
+      { label: sample("Precaution text", "সতর্কতার লেখা"), value: null, note: sample("Never mix cleaning chemicals; follow the label.", "পরিষ্কারক রাসায়নিক কখনো মেশাবেন না; লেবেল অনুসরণ করুন।") },
+      { label: sample("Verification", "যাচাই"), value: null, note: sample("No independent product-specific record is linked.", "স্বাধীন পণ্যভিত্তিক কোনো রেকর্ড যুক্ত নেই।") },
+    ], evidence: evidenceHome(), reactionCounts: { likes: 63, dislikes: 9 },
+  },
+  {
+    id: "aci-aerosol", barcode: "9000000000215", category: "household",
+    name: sample("ACI Aerosol Insect Killer", "এসি আই অ্যারোসল ইনসেক্ট কিলার"), brand: sample("ACI", "এসি আই"), size: sample("400 ml", "৪০০ মি.লি."),
+    description: sample("A Bangladesh-market household insect-control example. This preview is a label guide, not an efficacy or safety certification.", "বাংলাদেশের বাজারের গৃহস্থালি পোকা নিয়ন্ত্রণ পণ্যের উদাহরণ। এই প্রিভিউ লেবেল গাইড, কার্যকারিতা বা নিরাপত্তার সনদ নয়।"), image: require("../assets/images/products/generated/aci-aerosol.webp") as ImageSourcePropType,
+    ingredients: [sample("Aerosol propellant", "অ্যারোসল প্রোপেল্যান্ট"), sample("Active insect-control ingredients", "সক্রিয় পোকা-নিয়ন্ত্রণ উপাদান"), sample("Fragrance", "সুগন্ধি")], ingredientExplanations: [sample("The full active-ingredient and precaution information is on the can.", "সক্রিয় উপাদান ও সতর্কতার সম্পূর্ণ তথ্য ক্যানের গায়ে থাকে।"), sample("Use only according to the package directions.", "শুধু প্যাকেটের নির্দেশনা অনুযায়ী ব্যবহার করুন।"), sample("Keep away from children, food and flames as directed on the label.", "লেবেলের নির্দেশনা অনুযায়ী শিশু, খাবার ও আগুন থেকে দূরে রাখুন।")],
+    demo: true, gradeLabel: sample("Use-label summary only", "শুধু ব্যবহার-লেবেলের সারাংশ"), factors: [
+      { label: sample("Directions for use", "ব্যবহারের নির্দেশনা"), value: null, note: sample("Read the can before use and follow its directions.", "ব্যবহারের আগে ক্যানের লেখা পড়ে নির্দেশনা অনুসরণ করুন।") },
+      { label: sample("Precaution text", "সতর্কতার লেখা"), value: null, note: sample("Follow storage, ventilation and handling precautions.", "সংরক্ষণ, বায়ু চলাচল ও ব্যবহারের সতর্কতা অনুসরণ করুন।") },
+      { label: sample("Verification", "যাচাই"), value: null, note: sample("No independent product-specific record is linked.", "স্বাধীন পণ্যভিত্তিক কোনো রেকর্ড যুক্ত নেই।") },
+    ], evidence: evidenceHome(), reactionCounts: { likes: 58, dislikes: 11 },
+  },
+
   alternativeProduct({ id: "mangofield-mango-drink", barcode: "9000000000201", family: "mango-drink", name: sample("MangoField Mango Nectar", "ম্যাঙ্গোফিল্ড ম্যাঙ্গো নেকটার"), brand: sample("MangoField", "ম্যাঙ্গোফিল্ড"), size: sample("250 ml", "২৫০ মি.লি."), image: require("../assets/images/products/generated/mangofield-mango-drink.webp") as ImageSourcePropType, score: 88, ingredients: [sample("Water", "পানি"), sample("Mango pulp", "আমের পাল্প"), sample("Sugar", "চিনি")], reactionCounts: { likes: 188, dislikes: 11 } }),
   alternativeProduct({ id: "aamrush-mango-drink", barcode: "9000000000202", family: "mango-drink", name: sample("AamRush Mango Drink", "আমরাশ ম্যাঙ্গো ড্রিঙ্ক"), brand: sample("AamRush", "আমরাশ"), size: sample("250 ml", "২৫০ মি.লি."), image: require("../assets/images/products/generated/aamrush-mango-drink.webp") as ImageSourcePropType, score: 82, ingredients: [sample("Water", "পানি"), sample("Mango puree", "আমের পিউরি"), sample("Sugar", "চিনি")], reactionCounts: { likes: 164, dislikes: 14 } }),
   alternativeProduct({ id: "tropidrop-mango-drink", barcode: "9000000000203", family: "mango-drink", name: sample("TropiDrop Mango Fruit Drink", "ট্রপিড্রপ ম্যাঙ্গো ফ্রুট ড্রিঙ্ক"), brand: sample("TropiDrop", "ট্রপিড্রপ"), size: sample("200 ml", "২০০ মি.লি."), image: require("../assets/images/products/tropidrop-mango-drink.webp") as ImageSourcePropType, score: 74, ingredients: [sample("Water", "পানি"), sample("Mango juice", "আমের জুস"), sample("Sugar", "চিনি")], reactionCounts: { likes: 139, dislikes: 16 } }),

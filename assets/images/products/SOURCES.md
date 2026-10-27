@@ -13,6 +13,8 @@ Package photos were found through image search and normalized into local WebP fi
 | `vim-dishwash.webp` | Vim Dishwashing Liquid | [Unilever Bangladesh Vim page](https://www.unilever.com.bd/brands/home-care/vim/); [Quicky listing](https://quickybd.com/products/vim-dishwashing-liquid-bottle-500ml/) | “Vim Dishwashing Liquid 75ml - Ushopbd” |
 | `wheel-detergent.webp` | Wheel Washing Powder | [Unilever Bangladesh Wheel page](https://www.unilever.com.bd/brands/home-care/wheel/); [Shwapno listing](https://www.shwapno.com/wheel-clean-and-fresh-2in1-detergent-powder-1kg) | “Wheel Washing (Detergent) Powder 2in1 Clean & Fresh 1Kg” |
 
+The catalog also includes six additional Bangladesh-market personal-care and home-care prototype records: Lux Soft Touch Beauty Soap, Sunsilk Black Shine Shampoo, Dettol Original Handwash, Rin Power Bright Detergent, Harpic Power Plus Toilet Cleaner and ACI Aerosol Insect Killer. Their displayed ingredients and label notes are demonstration content; verify the exact current package before using any product information.
+
 The exact downloaded and resized photos live in this folder. Their appearance is for product recognition in the prototype and is not evidence of ingredients, nutrition, certification or safety. Confirm image/media reuse rights before distributing the app.
 
 
@@ -53,3 +55,16 @@ The eight alternative-product images below are AI-generated fictional package re
 | SunCrisp Potato Chips | `assets/images/products/generated/suncrisp-potato-chips.webp` |
 | CrunchBay Potato Snack | `assets/images/products/generated/crunchbay-potato-snack.webp` |
 | GoldenRoot Potato Crisps | `assets/images/products/generated/goldenroot-potato-crisps.webp` |
+
+## Additional non-food prototype package renders
+
+These six generated package renders are fictional prototype visuals inspired by familiar Bangladesh retail categories. They are not official brand photography, certification, efficacy evidence or a substitute for exact current product packaging. The app keeps these products in personal-care or home-care categories and does not assign them food scores.
+
+| Product | Reserved managed preview asset |
+|---|---|
+| Lux Soft Touch Beauty Soap | `assets/images/products/generated/lux-soft-touch-soap.webp` |
+| Sunsilk Black Shine Shampoo | `assets/images/products/generated/sunsilk-black-shine.webp` |
+| Dettol Original Handwash | `assets/images/products/generated/dettol-original-handwash.webp` |
+| Rin Power Bright Detergent | `assets/images/products/generated/rin-power-bright.webp` |
+| Harpic Power Plus Toilet Cleaner | `assets/images/products/generated/harpic-power-plus.webp` |
+| ACI Aerosol Insect Killer | `assets/images/products/generated/aci-aerosol.webp` |

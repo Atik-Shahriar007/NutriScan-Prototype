@@ -78,3 +78,8 @@
 ## 14. Web mock-camera scanner
 - [x] On Expo Web Preview only, provide a “Try mock camera” toggle that opens a camera-like scan frame with a continuously repeating scan beam, clearly labeled as a mock preview.
 - [x] Provide a “Simulate barcode scan” action that uses the same barcode lookup path as native scanning and opens the matched prototype product detail; preserve native `expo-camera` permission and scanning behavior unchanged.
+
+## 15. Bangladesh personal-care and home-care catalog expansion
+- [x] Add three personal-care records—Lux Soft Touch Beauty Soap, Sunsilk Black Shine Shampoo and Dettol Original Handwash—with bilingual names, brands, sizes, prototype ingredient notes, label-oriented evidence rows and no food-style scores.
+- [x] Add three home-care records—Rin Power Bright Detergent, Harpic Power Plus Toilet Cleaner and ACI Aerosol Insect Killer—with bilingual names, brands, sizes, prototype use/precaution notes, evidence rows and no food-style scores.
+- [x] Replace the six new records’ reserved generated package-render URLs with bundled local assets once the asynchronous image generation completes; keep all visuals clearly marked as fictional prototype renders rather than official product photography.
