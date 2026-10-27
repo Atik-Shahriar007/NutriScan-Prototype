@@ -38,3 +38,18 @@ The following nine package-art files were created for the local prototype catalo
 | `suncrisp-potato-chips.webp` | SunCrisp Potato Chips | Potato snack | Exact package-art mark · `local://assets/images/products/SOURCES.md#suncrisp-potato-chips` |
 | `crunchbay-potato-snack.webp` | CrunchBay Potato Snack | Potato snack | Exact package-art mark · `local://assets/images/products/SOURCES.md#crunchbay-potato-snack` |
 | `goldenroot-potato-crisps.webp` | GoldenRoot Potato Crisps | Potato snack | Exact package-art mark · `local://assets/images/products/SOURCES.md#goldenroot-potato-crisps` |
+
+## Generated prototype package renders
+
+The eight alternative-product images below are AI-generated fictional package renders created for this prototype to replace the earlier generic placeholder art. They are not photographs of real commercial products and should not be presented as actual retail packaging or evidence of product facts. The completed renders are bundled locally under `assets/images/products/generated/` for stable web and native-preview use.
+
+| Product | Managed preview asset |
+|---|---|
+| MangoField Mango Nectar | `assets/images/products/generated/mangofield-mango-drink.webp` |
+| AamRush Mango Drink | `assets/images/products/generated/aamrush-mango-drink.webp` |
+| DailyCup Tomato Noodles | `assets/images/products/generated/dailycup-tomato-noodles.webp` |
+| Cocora Spicy Noodles | `assets/images/products/generated/cocora-spicy-noodles.webp` |
+| NoodleCraft Masala Noodles | `assets/images/products/generated/noodlecraft-masala.webp` |
+| SunCrisp Potato Chips | `assets/images/products/generated/suncrisp-potato-chips.webp` |
+| CrunchBay Potato Snack | `assets/images/products/generated/crunchbay-potato-snack.webp` |
+| GoldenRoot Potato Crisps | `assets/images/products/generated/goldenroot-potato-crisps.webp` |
