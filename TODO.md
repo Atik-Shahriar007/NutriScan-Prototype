@@ -62,6 +62,7 @@
 - Catalog grades, ingredient quantities, recommendation scores and starting reaction totals are local preview content, not official safety, nutrition or certification determinations.
 - Profile, votes, theme, language, history, favorites, contribution drafts and Halal Mode preference remain local; no live product database, moderation/review queue, account sync, online votes or payment connection is part of this prototype.
 - The Expo Web Preview uses manual barcode/demo lookup; native camera behavior has not been verified on a physical device.
+- The Expo Web Preview also provides an explicit mock-camera mode with a continuous scan beam and simulated catalog barcode action for testing the scanner UI without native hardware.
 - Package photographs are product-recognition references, not evidence of every product fact or commercial image rights. Clear reuse rights before distribution.
 - NutriScan is a working name; trademark, domain and app-store clearance have not been performed.
 
@@ -73,3 +74,7 @@
 - [x] Improve History, Scanner and Contribute first-use flows with a useful empty-state CTA, explicit empty/manual-input validation, retry/rescan recovery, clearer disabled-form requirements and larger bilingual category controls.
 - [x] Improve Product Detail, Support, Community and NutriFacts action hierarchy and disclosure/source accessibility without inventing backend, payment, account or live-community behavior.
 - [ ] Preserve English/Bangla wrapping, light/dark contrast, prototype caveats and local-only boundaries across every refined route; validate TypeScript, tests, lint and live preview routes before marking this outcome complete. TypeScript, the project `pnpm lint` command, tests and live light-theme preview routes pass; a raw repository-wide ESLint sweep still reports pre-existing errors in `hooks/use-auth.ts` and `hooks/use-color-scheme.web.ts`, and a full Bengali/dark-theme route pass remains open.
+
+## 14. Web mock-camera scanner
+- [x] On Expo Web Preview only, provide a “Try mock camera” toggle that opens a camera-like scan frame with a continuously repeating scan beam, clearly labeled as a mock preview.
+- [x] Provide a “Simulate barcode scan” action that uses the same barcode lookup path as native scanning and opens the matched prototype product detail; preserve native `expo-camera` permission and scanning behavior unchanged.

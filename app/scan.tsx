@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { CameraView, useCameraPermissions } from "expo-camera";
 import { useLocalSearchParams, useRouter } from "expo-router";
-import { Pressable, Platform, TextInput, View } from "react-native";
+import { Animated, Pressable, Platform, TextInput, View } from "react-native";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { AppText, Card, DemoNotice, PageHeader, Pill, PrimaryButton, ProductRow, Screen, SecondaryButton, fontFamily, usePalette } from "@/components/nutriscan-ui";
 import { filterProductsByHalal, isHalalEligible, productByBarcode, products, t } from "@/lib/nutriscan-data";
@@ -20,12 +20,26 @@ export default function ScanScreen() {
   const [halalBlockedCode, setHalalBlockedCode] = useState("");
   const [permissionMessage, setPermissionMessage] = useState("");
   const [inputMessage, setInputMessage] = useState("");
+  const [mockCameraEnabled, setMockCameraEnabled] = useState(false);
+  const [scanBeam] = useState(() => new Animated.Value(0));
 
   useEffect(() => {
     // The scanner route can be revisited with a new barcode while mounted.
     // eslint-disable-next-line react-hooks/set-state-in-effect
     if (typeof params.barcode === "string") setBarcode(params.barcode);
   }, [params.barcode]);
+
+  useEffect(() => {
+    if (Platform.OS !== "web" || !mockCameraEnabled) return;
+    const animation = Animated.loop(Animated.sequence([
+      Animated.timing(scanBeam, { toValue: 1, duration: 950, useNativeDriver: true }),
+      Animated.delay(500),
+      Animated.timing(scanBeam, { toValue: 0, duration: 950, useNativeDriver: true }),
+      Animated.delay(500),
+    ]));
+    animation.start();
+    return () => animation.stop();
+  }, [mockCameraEnabled, scanBeam]);
 
   const openCode = (raw: string) => {
     const code = normalizeBarcode(raw);
@@ -66,10 +80,27 @@ export default function ScanScreen() {
             <AppText weight="semibold" style={{ position: "absolute", bottom: 17, color: palette.cameraText, fontSize: 11 }}>{language === "en" ? "Place barcode within the frame" : "বারকোডটি ফ্রেমের ভেতরে রাখুন"}</AppText>
           </View>
         </View>
+      ) : Platform.OS === "web" && mockCameraEnabled ? (
+        <View style={{ gap: 10 }}>
+          <View style={{ height: 245, borderRadius: 22, overflow: "hidden", backgroundColor: "#18261D", borderWidth: 1, borderColor: palette.green }}>
+            <View style={{ flex: 1, alignItems: "center", justifyContent: "center", backgroundColor: "#20392B" }}>
+              <MaterialCommunityIcons name="camera-wireless-outline" size={46} color="#B8E6C4" />
+              <AppText style={{ color: "#DDF6E3", fontSize: 10, marginTop: 8 }}>{language === "en" ? "Mock camera preview" : "মক ক্যামেরা প্রিভিউ"}</AppText>
+            </View>
+            <View pointerEvents="none" style={{ position: "absolute", top: 0, left: 0, right: 0, bottom: 0, alignItems: "center", justifyContent: "center" }}>
+              <View style={{ width: "76%", height: 96, borderWidth: 2, borderColor: palette.amber, borderRadius: 16, backgroundColor: "rgba(255,255,255,0.04)" }} />
+              <Animated.View style={{ position: "absolute", width: "72%", height: 3, borderRadius: 2, backgroundColor: palette.amber, shadowColor: palette.amber, shadowOpacity: 0.95, shadowRadius: 8, transform: [{ translateY: scanBeam.interpolate({ inputRange: [0, 1], outputRange: [-42, 42] }) }] }} />
+              <AppText weight="semibold" style={{ position: "absolute", bottom: 17, color: palette.cameraText, fontSize: 11 }}>{language === "en" ? "Mock scan beam is active" : "মক স্ক্যান বিম সক্রিয়"}</AppText>
+            </View>
+          </View>
+          <PrimaryButton title={language === "en" ? "Simulate barcode scan" : "বারকোড স্ক্যান অনুকরণ করুন"} icon="barcode-scan" onPress={() => openCode(products[0].barcode)} />
+          <SecondaryButton title={language === "en" ? "Exit mock camera" : "মক ক্যামেরা বন্ধ করুন"} icon="close" onPress={() => setMockCameraEnabled(false)} />
+        </View>
       ) : (
         <Card style={{ alignItems: "center", paddingVertical: 22, backgroundColor: palette.brandMark }}>
           <View style={{ width: 68, height: 68, borderRadius: 24, backgroundColor: palette.card, alignItems: "center", justifyContent: "center" }}><MaterialCommunityIcons name="barcode-scan" size={34} color={palette.green} /></View>
           <AppText weight="semibold" style={{ fontSize: 15, textAlign: "center" }}>{Platform.OS === "web" ? t(language, "cameraUnavailable") : permission?.granted === false ? t(language, "cameraPermission") : t(language, "scannerTitle")}</AppText>
+          {Platform.OS === "web" ? <SecondaryButton title={language === "en" ? "Try mock camera" : "মক ক্যামেরা চালু করুন"} icon="camera-outline" onPress={() => setMockCameraEnabled(true)} style={{ alignSelf: "stretch" }} /> : null}
           {Platform.OS !== "web" && permission?.granted === false ? <PrimaryButton title={language === "en" ? "Allow camera" : "ক্যামেরার অনুমতি দিন"} icon="camera-outline" onPress={async () => { const result = await requestPermission(); if (!result.granted) setPermissionMessage(language === "en" ? "Camera access was not granted. Manual lookup is still available." : "ক্যামেরার অনুমতি মেলেনি। বারকোড লিখে খুঁজতে পারেন।"); }} style={{ alignSelf: "stretch" }} /> : null}
           {permissionMessage ? <AppText style={{ color: palette.clay, fontSize: 11, textAlign: "center" }}>{permissionMessage}</AppText> : null}
         </Card>
