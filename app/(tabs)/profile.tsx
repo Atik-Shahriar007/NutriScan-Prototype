@@ -66,6 +66,7 @@ export default function ProfileHubScreen() {
     setHalalMode,
     childSafeMode,
     setChildSafeMode,
+    compareIds,
   } = useNutriScan();
 
   const displayName = profile.displayName.trim() || demoAccount.name;
@@ -241,6 +242,18 @@ export default function ProfileHubScreen() {
       <View style={{ gap: 8 }}>
         <SectionHeading title={language === "en" ? "Features" : "ফিচারসমূহ"} />
         <Card style={{ paddingVertical: 4, gap: 0 }}>
+          <MenuRow
+            icon="compare-horizontal"
+            title={t(language, "compareProducts")}
+            subtitle={language === "en" ? "Compare 2 food products side by side" : "পাশাপাশি ২টি খাবার পণ্য তুলনা করুন"}
+            right={
+              compareIds.length > 0 ? (
+                <Pill tone="green">{compareIds.length}/2</Pill>
+              ) : undefined
+            }
+            onPress={() => router.push("/compare")}
+          />
+          <View style={{ height: 1, backgroundColor: palette.line }} />
           <MenuRow
             icon="crown-outline"
             tone="amber"

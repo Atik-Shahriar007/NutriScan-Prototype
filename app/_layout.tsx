@@ -56,6 +56,7 @@ function AppNavigator() {
         <Stack.Screen name="(tabs)" />
         <Stack.Screen name="onboarding" options={{ headerShown: false }} />
         <Stack.Screen name="scan" options={{ presentation: "modal" }} />
+        <Stack.Screen name="compare" options={{ presentation: "card" }} />
         <Stack.Screen name="product/[id]" options={{ presentation: "card" }} />
         <Stack.Screen name="ingredient/[id]" options={{ presentation: "card" }} />
         <Stack.Screen name="account/health-profile" />

@@ -60,6 +60,7 @@ type StoredState = {
   expiryReminders: ExpiryReminder[];
   savedTips: string[];
   nouriHistory: NouriMessage[];
+  compareIds: string[];
 };
 
 type AppState = StoredState & {
@@ -85,6 +86,10 @@ type AppState = StoredState & {
   toggleSavedTip: (tipId: string) => void;
   addNouriMessage: (msg: Omit<NouriMessage, "id" | "timestamp">) => void;
   clearNouriHistory: () => void;
+  addToCompare: (productId: string) => void;
+  setCompareSlot: (slot: 0 | 1, productId: string | null) => void;
+  swapCompareSlots: () => void;
+  clearCompare: () => void;
 };
 
 const STORAGE_KEY = "nutriscan-prototype-state-v1";
@@ -121,6 +126,7 @@ export function NutriScanProvider({ children }: { children: React.ReactNode }) {
   const [expiryReminders, setExpiryReminders] = useState<ExpiryReminder[]>([]);
   const [savedTips, setSavedTips] = useState<string[]>([]);
   const [nouriHistory, setNouriHistory] = useState<NouriMessage[]>([]);
+  const [compareIds, setCompareIds] = useState<string[]>([]);
   const [ready, setReady] = useState(false);
 
   useEffect(() => {
@@ -161,6 +167,7 @@ export function NutriScanProvider({ children }: { children: React.ReactNode }) {
           if (Array.isArray(parsed.expiryReminders)) setExpiryReminders(parsed.expiryReminders);
           if (Array.isArray(parsed.savedTips) && parsed.savedTips.every((id) => typeof id === "string")) setSavedTips(parsed.savedTips);
           if (Array.isArray(parsed.nouriHistory)) setNouriHistory(parsed.nouriHistory);
+          if (Array.isArray(parsed.compareIds) && parsed.compareIds.every((id) => typeof id === "string")) setCompareIds(parsed.compareIds.slice(0, 2));
         } catch {
           // Ignore malformed prototype data; the user can continue with a clean local state.
         }
@@ -193,6 +200,7 @@ export function NutriScanProvider({ children }: { children: React.ReactNode }) {
       expiryReminders,
       savedTips,
       nouriHistory,
+      compareIds,
     };
     AsyncStorage.setItem(STORAGE_KEY, JSON.stringify(payload)).catch(() => undefined);
   }, [
@@ -213,6 +221,7 @@ export function NutriScanProvider({ children }: { children: React.ReactNode }) {
     expiryReminders,
     savedTips,
     nouriHistory,
+    compareIds,
     ready,
   ]);
 
@@ -267,6 +276,41 @@ export function NutriScanProvider({ children }: { children: React.ReactNode }) {
     setNouriHistory([]);
   }, []);
 
+  const addToCompare = useCallback((productId: string) => {
+    setCompareIds((current) => {
+      if (current.includes(productId)) return current;
+      if (current.length < 2) return [...current, productId];
+      return [current[1], productId];
+    });
+  }, []);
+
+  const setCompareSlot = useCallback((slot: 0 | 1, productId: string | null) => {
+    setCompareIds((current) => {
+      const first = current[0] ?? null;
+      const second = current[1] ?? null;
+      const slots: [string | null, string | null] = [first, second];
+
+      if (productId === null) {
+        slots[slot] = null;
+      } else {
+        const otherSlot = slot === 0 ? 1 : 0;
+        if (slots[otherSlot] === productId) {
+          slots[otherSlot] = slots[slot];
+        }
+        slots[slot] = productId;
+      }
+      return slots.filter((id): id is string => Boolean(id));
+    });
+  }, []);
+
+  const swapCompareSlots = useCallback(() => {
+    setCompareIds((current) => (current.length === 2 ? [current[1], current[0]] : current));
+  }, []);
+
+  const clearCompare = useCallback(() => {
+    setCompareIds([]);
+  }, []);
+
   const value = useMemo<AppState>(
     () => ({
       language,
@@ -285,6 +329,7 @@ export function NutriScanProvider({ children }: { children: React.ReactNode }) {
       expiryReminders,
       savedTips,
       nouriHistory,
+      compareIds,
       ready,
       setLanguage,
       setAppearance,
@@ -328,6 +373,10 @@ export function NutriScanProvider({ children }: { children: React.ReactNode }) {
       toggleSavedTip,
       addNouriMessage,
       clearNouriHistory,
+      addToCompare,
+      setCompareSlot,
+      swapCompareSlots,
+      clearCompare,
     }),
     [
       language,
@@ -347,6 +396,7 @@ export function NutriScanProvider({ children }: { children: React.ReactNode }) {
       expiryReminders,
       savedTips,
       nouriHistory,
+      compareIds,
       ready,
       recordScan,
       setDemoAccount,
@@ -356,6 +406,10 @@ export function NutriScanProvider({ children }: { children: React.ReactNode }) {
       toggleSavedTip,
       addNouriMessage,
       clearNouriHistory,
+      addToCompare,
+      setCompareSlot,
+      swapCompareSlots,
+      clearCompare,
     ],
   );
 

@@ -26,78 +26,14 @@ import {
   t,
 } from "@/lib/nutriscan-data";
 import type { NutritionItem } from "@/lib/nutriscan-data";
+import {
+  formatTeaspoonCount,
+  isAllergenIngredient,
+  isPositiveIngredient,
+  parseAddedSugarTeaspoons,
+  scoreCategoryLabel,
+} from "@/lib/nutrition-utils";
 import { useNutriScan } from "@/lib/nutriscan-state";
-
-const ALLERGEN_KEYWORDS = [
-  "wheat",
-  "gluten",
-  "milk",
-  "dairy",
-  "egg",
-  "soy",
-  "peanut",
-  "nut",
-  "fish",
-  "shellfish",
-  "seasoning",
-  "গম",
-  "দুধ",
-  "ডিম",
-  "সয়া",
-  "বাদাম",
-  "মাছ",
-];
-
-const POSITIVE_INGREDIENT_KEYWORDS = [
-  "mango",
-  "pulp",
-  "tea",
-  "potato",
-  "water",
-  "oat",
-  "milk",
-  "আম",
-  "পাল্প",
-  "চা",
-  "আলু",
-  "পানি",
-];
-
-function isAllergenIngredient(nameEn: string, nameBn: string): boolean {
-  const combined = `${nameEn} ${nameBn}`.toLowerCase();
-  return ALLERGEN_KEYWORDS.some((kw) => combined.includes(kw));
-}
-
-function isPositiveIngredient(nameEn: string, nameBn: string): boolean {
-  const combined = `${nameEn} ${nameBn}`.toLowerCase();
-  return POSITIVE_INGREDIENT_KEYWORDS.some((kw) => combined.includes(kw));
-}
-
-function scoreCategoryLabel(score: number, language: "en" | "bn"): string {
-  if (score >= 75) return language === "en" ? "Excellent" : "চমৎকার";
-  if (score >= 60) return language === "en" ? "Good" : "ভালো";
-  if (score >= 50) return language === "en" ? "Fair" : "মোটামুটি";
-  if (score >= 35) return language === "en" ? "Check Label" : "লেবেল দেখুন";
-  return language === "en" ? "Poor" : "দুর্বল";
-}
-
-const BENGALI_DIGITS = ["০", "১", "২", "৩", "৪", "৫", "৬", "৭", "৮", "৯"];
-
-function formatTeaspoonCount(tsp: number, language: "en" | "bn"): string {
-  const raw = Number(tsp.toFixed(2)).toString();
-  if (language === "en") return raw;
-  return raw.replace(/\d/g, (d) => BENGALI_DIGITS[Number(d)] ?? d);
-}
-
-function parseAddedSugarTeaspoons(item: NutritionItem): number | null {
-  const labelEn = item.label.en.toLowerCase();
-  if (!labelEn.includes("added sugar")) return null;
-  const match = item.amount.en.match(/(\d+(?:\.\d+)?)\s*g\b/i);
-  if (!match) return null;
-  const grams = Number(match[1]);
-  if (!Number.isFinite(grams)) return null;
-  return grams / 4;
-}
 
 function NutritionRow({
   item,
@@ -339,6 +275,8 @@ export default function ProductDetailScreen() {
     toggleFavorite,
     productReactions,
     setProductReaction,
+    compareIds,
+    addToCompare,
   } = useNutriScan();
   const [expandedRows, setExpandedRows] = useState<string[]>([]);
   const [expandedIngredients, setExpandedIngredients] = useState<number[]>([]);
@@ -406,6 +344,7 @@ export default function ProductDetailScreen() {
   }
 
   const isFavorite = favorites.includes(product.id);
+  const inCompare = compareIds.includes(product.id);
   const currentReaction = productReactions[product.id];
   const alternatives = betterAlternatives(product, halalMode);
   const toggleExpanded = (key: string) =>
@@ -527,6 +466,27 @@ export default function ProductDetailScreen() {
           </View>
         </View>
       </Card>
+
+      {product.category === "food" ? (
+        <SecondaryButton
+          title={
+            inCompare
+              ? language === "en"
+                ? `In Compare (${compareIds.length}/2) · Open`
+                : `তুলনায় যুক্ত (${compareIds.length}/২) · দেখুন`
+              : compareIds.length === 1
+                ? language === "en"
+                  ? "Add to Compare (1 selected)"
+                  : "তুলনায় যোগ করুন (১টি নির্বাচিত)"
+                : t(language, "addToCompare")
+          }
+          icon="compare-horizontal"
+          onPress={() => {
+            addToCompare(product.id);
+            router.push("/compare");
+          }}
+        />
+      ) : null}
 
       {product.halalEvidence ? (
         <Card

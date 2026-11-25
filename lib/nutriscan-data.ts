@@ -553,6 +553,8 @@ const copy = {
   goodMorning: sample("Good morning", "শুভ সকাল"),
   goodAfternoon: sample("Good afternoon", "শুভ বিকেল"),
   goodEvening: sample("Good evening", "শুভ সন্ধ্যা"),
+  compareProducts: sample("Compare Products", "পণ্য তুলনা করুন"),
+  addToCompare: sample("Add to Compare", "তুলনায় যোগ করুন"),
 } satisfies Record<string, Localized>;
 
 export type CopyKey = keyof typeof copy;
