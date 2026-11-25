@@ -17,6 +17,30 @@ export type PrototypeSubmission = {
 export type Appearance = "light" | "dark";
 export type ProductReaction = "like" | "dislike";
 export type ProfileInfo = { displayName: string; district: string };
+export type DemoAccount = { name: string; email: string };
+export type HealthProfile = {
+  age: string;
+  gender: string;
+  country: string;
+  healthConditions: string[];
+  dietaryRestrictions: string[];
+  foodAllergies: string[];
+  foodIntolerances: string[];
+  nutritionGoals: string[];
+  avoidFoods: string[];
+};
+export type ExpiryReminder = {
+  id: string;
+  productName: string;
+  expiryDate: string;
+  addedAt: string;
+};
+export type NouriMessage = {
+  id: string;
+  role: "user" | "nouri";
+  text: string;
+  timestamp: string;
+};
 
 type StoredState = {
   language: Language;
@@ -27,6 +51,16 @@ type StoredState = {
   halalMode: boolean;
   profile: ProfileInfo;
   productReactions: Record<string, ProductReaction>;
+  isAuthenticated: boolean;
+  hasCompletedOnboarding: boolean;
+  demoAccount: DemoAccount;
+  healthProfile: HealthProfile;
+  isPremium: boolean;
+  childSafeMode: boolean;
+  expiryReminders: ExpiryReminder[];
+  savedTips: string[];
+  nouriHistory: NouriMessage[];
+  compareIds: string[];
 };
 
 type AppState = StoredState & {
@@ -41,10 +75,37 @@ type AppState = StoredState & {
   toggleFavorite: (productId: string) => void;
   updateProfile: (profile: Partial<ProfileInfo>) => void;
   setProductReaction: (productId: string, reaction: ProductReaction) => void;
+  setIsAuthenticated: (v: boolean) => void;
+  setHasCompletedOnboarding: (v: boolean) => void;
+  setDemoAccount: (v: Partial<DemoAccount>) => void;
+  setHealthProfile: (v: Partial<HealthProfile>) => void;
+  setIsPremium: (v: boolean) => void;
+  setChildSafeMode: (v: boolean) => void;
+  addExpiryReminder: (reminder: Omit<ExpiryReminder, "id" | "addedAt">) => void;
+  removeExpiryReminder: (id: string) => void;
+  toggleSavedTip: (tipId: string) => void;
+  addNouriMessage: (msg: Omit<NouriMessage, "id" | "timestamp">) => void;
+  clearNouriHistory: () => void;
+  addToCompare: (productId: string) => void;
+  setCompareSlot: (slot: 0 | 1, productId: string | null) => void;
+  swapCompareSlots: () => void;
+  clearCompare: () => void;
 };
 
 const STORAGE_KEY = "nutriscan-prototype-state-v1";
 const EMPTY_PROFILE: ProfileInfo = { displayName: "", district: "" };
+const DEFAULT_DEMO_ACCOUNT: DemoAccount = { name: "Atik Rahman", email: "demo@nutriscan.app" };
+const DEFAULT_HEALTH_PROFILE: HealthProfile = {
+  age: "24",
+  gender: "prefer-not-to-say",
+  country: "Bangladesh",
+  healthConditions: [],
+  dietaryRestrictions: [],
+  foodAllergies: [],
+  foodIntolerances: [],
+  nutritionGoals: ["balanced-nutrition"],
+  avoidFoods: [],
+};
 const AppStateContext = createContext<AppState | null>(null);
 
 export function NutriScanProvider({ children }: { children: React.ReactNode }) {
@@ -56,6 +117,16 @@ export function NutriScanProvider({ children }: { children: React.ReactNode }) {
   const [halalMode, setHalalMode] = useState(false);
   const [profile, setProfile] = useState<ProfileInfo>(EMPTY_PROFILE);
   const [productReactions, setProductReactions] = useState<Record<string, ProductReaction>>({});
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [hasCompletedOnboarding, setHasCompletedOnboarding] = useState(false);
+  const [demoAccount, setDemoAccountState] = useState<DemoAccount>(DEFAULT_DEMO_ACCOUNT);
+  const [healthProfile, setHealthProfileState] = useState<HealthProfile>(DEFAULT_HEALTH_PROFILE);
+  const [isPremium, setIsPremium] = useState(false);
+  const [childSafeMode, setChildSafeMode] = useState(false);
+  const [expiryReminders, setExpiryReminders] = useState<ExpiryReminder[]>([]);
+  const [savedTips, setSavedTips] = useState<string[]>([]);
+  const [nouriHistory, setNouriHistory] = useState<NouriMessage[]>([]);
+  const [compareIds, setCompareIds] = useState<string[]>([]);
   const [ready, setReady] = useState(false);
 
   useEffect(() => {
@@ -80,6 +151,23 @@ export function NutriScanProvider({ children }: { children: React.ReactNode }) {
             );
             setProductReactions(validReactions);
           }
+          if (typeof parsed.isAuthenticated === "boolean") setIsAuthenticated(parsed.isAuthenticated);
+          if (typeof parsed.hasCompletedOnboarding === "boolean") setHasCompletedOnboarding(parsed.hasCompletedOnboarding);
+          if (parsed.demoAccount && typeof parsed.demoAccount.name === "string" && typeof parsed.demoAccount.email === "string") {
+            setDemoAccountState({ name: parsed.demoAccount.name, email: parsed.demoAccount.email });
+          }
+          if (parsed.healthProfile && typeof parsed.healthProfile === "object") {
+            setHealthProfileState((current) => ({
+              ...current,
+              ...parsed.healthProfile,
+            }));
+          }
+          if (typeof parsed.isPremium === "boolean") setIsPremium(parsed.isPremium);
+          if (typeof parsed.childSafeMode === "boolean") setChildSafeMode(parsed.childSafeMode);
+          if (Array.isArray(parsed.expiryReminders)) setExpiryReminders(parsed.expiryReminders);
+          if (Array.isArray(parsed.savedTips) && parsed.savedTips.every((id) => typeof id === "string")) setSavedTips(parsed.savedTips);
+          if (Array.isArray(parsed.nouriHistory)) setNouriHistory(parsed.nouriHistory);
+          if (Array.isArray(parsed.compareIds) && parsed.compareIds.every((id) => typeof id === "string")) setCompareIds(parsed.compareIds.slice(0, 2));
         } catch {
           // Ignore malformed prototype data; the user can continue with a clean local state.
         }
@@ -94,15 +182,133 @@ export function NutriScanProvider({ children }: { children: React.ReactNode }) {
 
   useEffect(() => {
     if (!ready) return;
-    const payload: StoredState = { language, history, submissions, favorites, appearance, halalMode, profile, productReactions };
+    const payload: StoredState = {
+      language,
+      history,
+      submissions,
+      favorites,
+      appearance,
+      halalMode,
+      profile,
+      productReactions,
+      isAuthenticated,
+      hasCompletedOnboarding,
+      demoAccount,
+      healthProfile,
+      isPremium,
+      childSafeMode,
+      expiryReminders,
+      savedTips,
+      nouriHistory,
+      compareIds,
+    };
     AsyncStorage.setItem(STORAGE_KEY, JSON.stringify(payload)).catch(() => undefined);
-  }, [language, history, submissions, favorites, appearance, halalMode, profile, productReactions, ready]);
+  }, [
+    language,
+    history,
+    submissions,
+    favorites,
+    appearance,
+    halalMode,
+    profile,
+    productReactions,
+    isAuthenticated,
+    hasCompletedOnboarding,
+    demoAccount,
+    healthProfile,
+    isPremium,
+    childSafeMode,
+    expiryReminders,
+    savedTips,
+    nouriHistory,
+    compareIds,
+    ready,
+  ]);
 
   const recordScan = useCallback((productId: string) => {
     setHistory((current) => [
       { productId, scannedAt: new Date().toISOString() },
       ...current.filter((entry) => entry.productId !== productId),
     ].slice(0, 50));
+  }, []);
+
+  const setDemoAccount = useCallback((v: Partial<DemoAccount>) => {
+    setDemoAccountState((current) => ({ ...current, ...v }));
+  }, []);
+
+  const setHealthProfile = useCallback((v: Partial<HealthProfile>) => {
+    setHealthProfileState((current) => ({ ...current, ...v }));
+  }, []);
+
+  const addExpiryReminder = useCallback((reminder: Omit<ExpiryReminder, "id" | "addedAt">) => {
+    setExpiryReminders((current) => [
+      {
+        ...reminder,
+        id: `exp-${Date.now()}-${Math.random().toString(36).slice(2, 6)}`,
+        addedAt: new Date().toISOString(),
+      },
+      ...current,
+    ]);
+  }, []);
+
+  const removeExpiryReminder = useCallback((id: string) => {
+    setExpiryReminders((current) => current.filter((item) => item.id !== id));
+  }, []);
+
+  const toggleSavedTip = useCallback((tipId: string) => {
+    setSavedTips((current) =>
+      current.includes(tipId) ? current.filter((id) => id !== tipId) : [tipId, ...current],
+    );
+  }, []);
+
+  const addNouriMessage = useCallback((msg: Omit<NouriMessage, "id" | "timestamp">) => {
+    setNouriHistory((current) => [
+      ...current,
+      {
+        ...msg,
+        id: `nouri-${Date.now()}-${Math.random().toString(36).slice(2, 6)}`,
+        timestamp: new Date().toISOString(),
+      },
+    ]);
+  }, []);
+
+  const clearNouriHistory = useCallback(() => {
+    setNouriHistory([]);
+  }, []);
+
+  const addToCompare = useCallback((productId: string) => {
+    setCompareIds((current) => {
+      if (current.includes(productId)) return current;
+      if (current.length < 2) return [...current, productId];
+      return [current[1], productId];
+    });
+  }, []);
+
+  const setCompareSlot = useCallback((slot: 0 | 1, productId: string | null) => {
+    setCompareIds((current) => {
+      const first = current[0] ?? null;
+      const second = current[1] ?? null;
+      const slots: [string | null, string | null] = [first, second];
+
+      if (productId === null) {
+        slots[slot] = null;
+      } else {
+        const otherSlot = slot === 0 ? 1 : 0;
+        if (slots[otherSlot] === productId) {
+          slots[otherSlot] = slots[slot];
+        }
+        slots[slot] = productId;
+      }
+      return slots.filter((id): id is string => Boolean(id));
+    });
+  }, []);
+
+  const swapCompareSlots = useCallback(() => {
+    setCompareIds((current) => (current.length === 2 ? [current[1], current[0]] : current));
+  }, []);
+
+  const clearCompare = useCallback(() => {
+    setCompareIds([]);
   }, []);
 
   const value = useMemo<AppState>(
@@ -114,6 +320,16 @@ export function NutriScanProvider({ children }: { children: React.ReactNode }) {
       appearance,
       profile,
       productReactions,
+      isAuthenticated,
+      hasCompletedOnboarding,
+      demoAccount,
+      healthProfile,
+      isPremium,
+      childSafeMode,
+      expiryReminders,
+      savedTips,
+      nouriHistory,
+      compareIds,
       ready,
       setLanguage,
       setAppearance,
@@ -146,8 +362,55 @@ export function NutriScanProvider({ children }: { children: React.ReactNode }) {
           return next;
         });
       },
+      setIsAuthenticated,
+      setHasCompletedOnboarding,
+      setDemoAccount,
+      setHealthProfile,
+      setIsPremium,
+      setChildSafeMode,
+      addExpiryReminder,
+      removeExpiryReminder,
+      toggleSavedTip,
+      addNouriMessage,
+      clearNouriHistory,
+      addToCompare,
+      setCompareSlot,
+      swapCompareSlots,
+      clearCompare,
     }),
-    [language, history, submissions, favorites, appearance, halalMode, profile, productReactions, ready, recordScan],
+    [
+      language,
+      history,
+      submissions,
+      favorites,
+      appearance,
+      halalMode,
+      profile,
+      productReactions,
+      isAuthenticated,
+      hasCompletedOnboarding,
+      demoAccount,
+      healthProfile,
+      isPremium,
+      childSafeMode,
+      expiryReminders,
+      savedTips,
+      nouriHistory,
+      compareIds,
+      ready,
+      recordScan,
+      setDemoAccount,
+      setHealthProfile,
+      addExpiryReminder,
+      removeExpiryReminder,
+      toggleSavedTip,
+      addNouriMessage,
+      clearNouriHistory,
+      addToCompare,
+      setCompareSlot,
+      swapCompareSlots,
+      clearCompare,
+    ],
   );
 
   return <AppStateContext.Provider value={value}>{children}</AppStateContext.Provider>;

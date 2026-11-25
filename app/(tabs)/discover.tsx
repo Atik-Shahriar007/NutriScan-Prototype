@@ -3,7 +3,7 @@ import { Image, Pressable, ScrollView, TextInput, View } from "react-native";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { AppText, Card, PageHeader, Pill, Screen, SectionHeading, SecondaryButton, fontFamily, usePalette } from "@/components/nutriscan-ui";
-import { categoryLabel, filterProductsByHalal, products, productBrand, productName, t } from "@/lib/nutriscan-data";
+import { categoryLabel, filterProductsByChildSafe, filterProductsByHalal, products, productBrand, productName, t } from "@/lib/nutriscan-data";
 import type { Category } from "@/lib/nutriscan-data";
 import { useNutriScan } from "@/lib/nutriscan-state";
 
@@ -14,7 +14,7 @@ const categoryFromParam = (value?: string): Category | "all" => value === "all" 
 export default function DiscoverScreen() {
   const router = useRouter();
   const params = useLocalSearchParams<{ category?: string }>();
-  const { language, halalMode } = useNutriScan();
+  const { language, halalMode, childSafeMode, setChildSafeMode } = useNutriScan();
   const palette = usePalette();
   const [category, setCategory] = useState<Category | "all">(() => categoryFromParam(params.category));
   const [query, setQuery] = useState("");
@@ -23,14 +23,35 @@ export default function DiscoverScreen() {
     // eslint-disable-next-line react-hooks/set-state-in-effect
     if (params.category) setCategory(categoryFromParam(params.category));
   }, [params.category]);
-  const visibleProducts = useMemo(() => filterProductsByHalal(products, halalMode).filter((product) => {
+  const visibleProducts = useMemo(() => filterProductsByChildSafe(filterProductsByHalal(products, halalMode), childSafeMode).filter((product) => {
     const words = `${product.name.en} ${product.name.bn} ${product.brand.en} ${product.brand.bn} ${product.size.en}`.toLocaleLowerCase();
     return (category === "all" || product.category === category) && (!query.trim() || words.includes(query.trim().toLocaleLowerCase()));
-  }), [category, halalMode, query]);
+  }), [category, childSafeMode, halalMode, query]);
 
   return (
     <Screen contentStyle={{ gap: 16 }}>
       <PageHeader title={t(language, "discoverTitle")} subtitle={t(language, "discoverSubtitle")} />
+      {childSafeMode ? (
+        <Card style={{ flexDirection: "row", alignItems: "center", gap: 10, backgroundColor: palette.amberSoft, borderColor: palette.line, paddingVertical: 11 }}>
+          <MaterialCommunityIcons name="baby-face-outline" size={20} color={palette.amberInk} />
+          <View style={{ flex: 1, gap: 2 }}>
+            <AppText weight="semibold" style={{ color: palette.amberInk, fontSize: 12, lineHeight: 17 }}>
+              {language === "en" ? "Child Safe Mode is ON — products scoring below 60 are hidden" : "শিশু-নিরাপদ মোড চালু — ৬০-এর নিচে স্কোর করা পণ্য লুকানো আছে"}
+            </AppText>
+          </View>
+          <Pressable
+            accessibilityRole="button"
+            accessibilityLabel={language === "en" ? "Turn off Child Safe Mode" : "শিশু-নিরাপদ মোড বন্ধ করুন"}
+            onPress={() => setChildSafeMode(false)}
+            hitSlop={8}
+            style={({ pressed }) => ({ paddingHorizontal: 8, paddingVertical: 6, opacity: pressed ? 0.72 : 1 })}
+          >
+            <AppText weight="bold" style={{ color: palette.amberInk, fontSize: 11, textDecorationLine: "underline" }}>
+              {language === "en" ? "Turn off" : "বন্ধ করুন"}
+            </AppText>
+          </Pressable>
+        </Card>
+      ) : null}
       <View style={{ height: 48, borderRadius: 15, backgroundColor: palette.card, borderWidth: 1, borderColor: palette.line, flexDirection: "row", alignItems: "center", gap: 9, paddingHorizontal: 13 }}>
         <MaterialCommunityIcons name="magnify" size={19} color={palette.muted} />
         <TextInput value={query} onChangeText={setQuery} placeholder={t(language, "searchCatalog")} placeholderTextColor={palette.muted} accessibilityLabel={t(language, "searchCatalog")} accessibilityHint={language === "en" ? "Search product and brand names" : "পণ্য ও ব্র্যান্ডের নাম খুঁজুন"} returnKeyType="search" style={{ flex: 1, color: palette.ink, fontFamily: fontFamily(language), fontSize: 12, paddingVertical: 8 }} />

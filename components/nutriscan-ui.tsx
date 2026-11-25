@@ -4,6 +4,7 @@ import {
   Pressable,
   ScrollView,
   StyleSheet,
+  Switch,
   Text,
   View,
   type PressableProps,
@@ -16,7 +17,7 @@ import {
 import { SafeAreaView } from "react-native-safe-area-context";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { categoryLabel, productBrand, productName, t } from "@/lib/nutriscan-data";
-import type { Language, Product } from "@/lib/nutriscan-data";
+import type { Language, Localized, Product } from "@/lib/nutriscan-data";
 import { useNutriScan } from "@/lib/nutriscan-state";
 
 const nutriScanMark = require("../assets/images/nutriscan-mark.png");
@@ -272,4 +273,248 @@ export function IconTile({ icon, tone = "green" }: { icon: keyof typeof Material
   const color = tone === "amber" ? colors.amberInk : tone === "clay" ? colors.clay : colors.green;
   const backgroundColor = tone === "amber" ? colors.amberSoft : tone === "clay" ? colors.claySoft : colors.greenSoft;
   return <View style={[styles.iconTile, { backgroundColor }]}><MaterialCommunityIcons name={icon} size={21} color={color} /></View>;
+}
+
+export function ChipSelect({
+  options,
+  selected,
+  onToggle,
+  language,
+}: {
+  options: { value: string; label: Localized }[];
+  selected: string[];
+  onToggle: (value: string) => void;
+  language: Language;
+}) {
+  const colors = usePalette();
+  return (
+    <View style={{ flexDirection: "row", flexWrap: "wrap", gap: 8 }}>
+      {options.map((option) => {
+        const isSelected = selected.includes(option.value);
+        return (
+          <Pressable
+            key={option.value}
+            accessibilityRole="button"
+            accessibilityState={{ selected: isSelected }}
+            onPress={() => onToggle(option.value)}
+            style={({ pressed }) => ({
+              minHeight: 36,
+              borderRadius: 100,
+              paddingVertical: 8,
+              paddingHorizontal: 14,
+              borderWidth: 1,
+              borderColor: isSelected ? colors.green : colors.line,
+              backgroundColor: isSelected ? colors.green : colors.card,
+              alignItems: "center",
+              justifyContent: "center",
+              opacity: pressed ? 0.84 : 1,
+            })}
+          >
+            <AppText
+              weight={isSelected ? "semibold" : "medium"}
+              style={{ fontSize: 12, color: isSelected ? colors.onGreen : colors.ink }}
+            >
+              {option.label[language]}
+            </AppText>
+          </Pressable>
+        );
+      })}
+    </View>
+  );
+}
+
+export function ToggleCard({
+  icon,
+  title,
+  subtitle,
+  value,
+  onValueChange,
+  tone = "green",
+}: {
+  icon: keyof typeof MaterialCommunityIcons.glyphMap;
+  title: string;
+  subtitle: string;
+  value: boolean;
+  onValueChange: (value: boolean) => void;
+  tone?: "green" | "amber";
+}) {
+  const colors = usePalette();
+  const activeBg = tone === "amber" ? colors.amberSoft : colors.greenSoft;
+  const activeColor = tone === "amber" ? colors.amber : colors.green;
+  return (
+    <Card style={{ flexDirection: "row", alignItems: "center", gap: 12, backgroundColor: value ? activeBg : colors.card }}>
+      <IconTile icon={icon} tone={tone} />
+      <View style={{ flex: 1, gap: 4 }}>
+        <AppText weight="semibold" style={{ fontSize: 14 }}>{title}</AppText>
+        <AppText style={{ color: colors.muted, fontSize: 11, lineHeight: 16 }}>{subtitle}</AppText>
+      </View>
+      <Switch
+        value={value}
+        onValueChange={onValueChange}
+        accessibilityRole="switch"
+        accessibilityLabel={title}
+        accessibilityState={{ checked: value }}
+        trackColor={{ false: colors.line, true: activeBg }}
+        thumbColor={value ? activeColor : colors.muted}
+      />
+    </Card>
+  );
+}
+
+export function ScoreRing({
+  score,
+  size = 90,
+  showLabel = false,
+}: {
+  score: number;
+  size?: number;
+  showLabel?: boolean;
+}) {
+  const colors = usePalette();
+  const ringColor = score >= 75 ? colors.green : score >= 60 ? colors.amber : colors.clay;
+  const category =
+    score >= 75
+      ? "Excellent"
+      : score >= 60
+        ? "Good"
+        : score >= 50
+          ? "Fair"
+          : score >= 35
+            ? "Check Label"
+            : "Poor";
+  return (
+    <View style={{ alignItems: "center", gap: 8 }}>
+      <View
+        style={{
+          width: size,
+          height: size,
+          borderRadius: size / 2,
+          borderWidth: 7,
+          borderColor: ringColor,
+          alignItems: "center",
+          justifyContent: "center",
+          backgroundColor: colors.card,
+        }}
+      >
+        <AppText weight="bold" style={{ fontSize: Math.round(size * 0.28), lineHeight: Math.round(size * 0.34), color: ringColor }}>
+          {score}
+        </AppText>
+        <AppText style={{ fontSize: 10, color: colors.muted }}>/100</AppText>
+      </View>
+      {showLabel ? (
+        <AppText weight="semibold" style={{ fontSize: 12, color: ringColor }}>
+          {category}
+        </AppText>
+      ) : null}
+    </View>
+  );
+}
+
+export function TabSwitcher({
+  tabs,
+  activeKey,
+  onSelect,
+}: {
+  tabs: { key: string; label: string }[];
+  activeKey: string;
+  onSelect: (key: string) => void;
+}) {
+  const colors = usePalette();
+  const { appearance } = useNutriScan();
+  const activeBg = appearance === "dark" ? colors.card : colors.white;
+  return (
+    <View
+      style={{
+        flexDirection: "row",
+        backgroundColor: colors.neutralSoft,
+        borderRadius: 14,
+        padding: 4,
+        gap: 4,
+      }}
+    >
+      {tabs.map((tab) => {
+        const active = tab.key === activeKey;
+        return (
+          <Pressable
+            key={tab.key}
+            accessibilityRole="tab"
+            accessibilityState={{ selected: active }}
+            onPress={() => onSelect(tab.key)}
+            style={({ pressed }) => [
+              {
+                flex: 1,
+                minHeight: 40,
+                borderRadius: 11,
+                alignItems: "center",
+                justifyContent: "center",
+                paddingHorizontal: 10,
+                opacity: pressed ? 0.85 : 1,
+              },
+              active
+                ? {
+                    backgroundColor: activeBg,
+                    shadowColor: "#000000",
+                    shadowOffset: { width: 0, height: 1 },
+                    shadowOpacity: 0.08,
+                    shadowRadius: 3,
+                    elevation: 2,
+                  }
+                : null,
+            ]}
+          >
+            <AppText
+              weight={active ? "semibold" : "medium"}
+              style={{ fontSize: 13, color: active ? colors.ink : colors.muted }}
+            >
+              {tab.label}
+            </AppText>
+          </Pressable>
+        );
+      })}
+    </View>
+  );
+}
+
+export function EmptyState({
+  icon,
+  title,
+  body,
+  action,
+}: {
+  icon: keyof typeof MaterialCommunityIcons.glyphMap;
+  title: string;
+  body: string;
+  action?: { label: string; onPress: () => void };
+}) {
+  const colors = usePalette();
+  return (
+    <View style={{ alignItems: "center", justifyContent: "center", paddingVertical: 20, paddingHorizontal: 16, gap: 10 }}>
+      <View
+        style={{
+          width: 52,
+          height: 52,
+          borderRadius: 26,
+          backgroundColor: colors.greenSoft,
+          alignItems: "center",
+          justifyContent: "center",
+        }}
+      >
+        <MaterialCommunityIcons name={icon} size={25} color={colors.green} />
+      </View>
+      <AppText weight="semibold" style={{ fontSize: 14, textAlign: "center" }}>{title}</AppText>
+      <AppText style={{ color: colors.muted, fontSize: 12, textAlign: "center", lineHeight: 18 }}>{body}</AppText>
+      {action ? (
+        <PrimaryButton title={action.label} onPress={action.onPress} style={{ marginTop: 4, alignSelf: "stretch" }} />
+      ) : null}
+    </View>
+  );
+}
+
+export function PremiumBadge() {
+  const colors = usePalette();
+  return (
+    <Pill tone="amber">
+      <MaterialCommunityIcons name="star" size={11} color={colors.amberInk} /> Premium
+    </Pill>
+  );
 }
