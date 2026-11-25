@@ -1,6 +1,6 @@
 import "@/global.css";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { Stack } from "expo-router";
+import { Redirect, Stack, useSegments } from "expo-router";
 import { StatusBar } from "expo-status-bar";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
@@ -35,8 +35,9 @@ const nutriScanMark = require("../assets/images/nutriscan-mark.png");
 export const unstable_settings = { anchor: "(tabs)" };
 
 function AppNavigator() {
-  const { appearance, language, ready } = useNutriScan();
+  const { appearance, language, ready, hasCompletedOnboarding } = useNutriScan();
   const colors = usePalette();
+  const segments = useSegments();
   if (!ready) {
     return <View style={{ flex: 1, backgroundColor: colors.paper, alignItems: "center", justifyContent: "center", padding: 32, gap: 14 }}>
       <View style={{ width: 82, height: 82, borderRadius: 26, backgroundColor: colors.card, borderWidth: 1, borderColor: colors.line, alignItems: "center", justifyContent: "center" }}><Image source={nutriScanMark} resizeMode="contain" style={{ width: 76, height: 76, borderRadius: 22 }} /></View>
@@ -45,12 +46,25 @@ function AppNavigator() {
       <ActivityIndicator color={colors.green} />
     </View>;
   }
+  const inOnboarding = segments[0] === "onboarding";
+  if (!hasCompletedOnboarding && !inOnboarding) {
+    return <Redirect href="/onboarding" />;
+  }
   return (
     <View style={{ flex: 1, backgroundColor: colors.paper }}>
       <Stack screenOptions={{ headerShown: false, contentStyle: { backgroundColor: colors.paper } }}>
         <Stack.Screen name="(tabs)" />
+        <Stack.Screen name="onboarding" options={{ headerShown: false }} />
         <Stack.Screen name="scan" options={{ presentation: "modal" }} />
         <Stack.Screen name="product/[id]" options={{ presentation: "card" }} />
+        <Stack.Screen name="ingredient/[id]" options={{ presentation: "card" }} />
+        <Stack.Screen name="account/health-profile" />
+        <Stack.Screen name="account/nutrition-goals" />
+        <Stack.Screen name="account/preferences" />
+        <Stack.Screen name="account/premium" />
+        <Stack.Screen name="account/expiry-reminders" />
+        <Stack.Screen name="account/tips" />
+        <Stack.Screen name="account/settings" />
         <Stack.Screen name="oauth/callback" />
       </Stack>
       <StatusBar style={appearance === "dark" ? "light" : "dark"} />

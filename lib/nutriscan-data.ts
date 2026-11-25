@@ -366,6 +366,8 @@ export const productById = (id: string | undefined) => products.find((product) =
 export const productByBarcode = (barcode: string) => products.find((product) => product.barcode === barcode.trim());
 export const isHalalEligible = (product: Product) => Boolean(product.halalEvidence?.kind && product.halalEvidence.sourceUrl);
 export const filterProductsByHalal = (items: Product[], halalMode: boolean) => halalMode ? items.filter(isHalalEligible) : items;
+export const filterProductsByChildSafe = (items: Product[], childSafeMode: boolean) =>
+  childSafeMode ? items.filter((p) => p.score === undefined || p.score >= 60) : items;
 export const betterAlternatives = (product: Product, halalMode = false) => {
   const currentScore = product.score;
   if (product.category !== "food" || currentScore === undefined || currentScore >= 60 || !product.comparisonFamily) return [];
@@ -538,6 +540,19 @@ const copy = {
   turnOffHalalMode: sample("Turn off Halal Mode", "হালাল মোড বন্ধ করুন"),
   halalEvidenceLabel: sample("Exact-product evidence", "নির্দিষ্ট পণ্যের তথ্য"),
   packageMarkEvidence: sample("Halal mark shown on the exact package record.", "নির্দিষ্ট প্যাকেট রেকর্ডে হালাল মার্ক দেখানো হয়েছে।"),
+  nouri: sample("Nouri", "নৌরি"),
+  nouriTagline: sample("Your AI nutrition assistant", "আপনার AI পুষ্টি সহকারী"),
+  profile: sample("Profile", "প্রোফাইল"),
+  home: sample("Home", "হোম"),
+  premium: sample("Premium", "প্রিমিয়াম"),
+  childSafeMode: sample("Child Safe Mode", "শিশু-নিরাপদ মোড"),
+  healthProfile: sample("Health Profile", "স্বাস্থ্য প্রোফাইল"),
+  nutritionGoals: sample("Nutrition Goals", "পুষ্টির লক্ষ্য"),
+  tipOfDay: sample("Tip for You", "আপনার জন্য টিপ"),
+  recentScans: sample("Recent Scans", "সাম্প্রতিক স্ক্যান"),
+  goodMorning: sample("Good morning", "শুভ সকাল"),
+  goodAfternoon: sample("Good afternoon", "শুভ বিকেল"),
+  goodEvening: sample("Good evening", "শুভ সন্ধ্যা"),
 } satisfies Record<string, Localized>;
 
 export type CopyKey = keyof typeof copy;

@@ -83,3 +83,24 @@
 - [x] Add three personal-care records—Lux Soft Touch Beauty Soap, Sunsilk Black Shine Shampoo and Dettol Original Handwash—with bilingual names, brands, sizes, prototype ingredient notes, label-oriented evidence rows and no food-style scores.
 - [x] Add three home-care records—Rin Power Bright Detergent, Harpic Power Plus Toilet Cleaner and ACI Aerosol Insect Killer—with bilingual names, brands, sizes, prototype use/precaution notes, evidence rows and no food-style scores.
 - [x] Replace the six new records’ reserved generated package-render URLs with bundled local assets once the asynchronous image generation completes; keep all visuals clearly marked as fictional prototype renders rather than official product photography.
+
+## 16. UI/UX Upgrade (Phase 1-4)
+- [x] Extended state management with health profile, premium, child safe mode, expiry, Nouri history
+- [x] New 5-tab navigation: Home, Discover, Scan (FAB), Nouri, Profile
+- [x] Enhanced Home screen with greeting, tips, recent scans
+- [x] Onboarding and simulated authentication flow
+- [x] Profile hub screen replacing More tab
+- [x] Health Profile editor with multi-select chips
+- [x] Nutrition Goals selection screen
+- [x] Preferences screen (Halal, Child Safe, Language, Appearance)
+- [x] Premium subscription demo screen
+- [x] Expiry Reminders tracker
+- [x] Tips for Me screen
+- [x] Settings screen
+- [x] Nouri AI chatbot with mock responses and personalization
+- [x] Enhanced Product Detail with improved NQSS display, tabs, factor bars
+- [x] Ingredient Explainer with mini database
+- [x] OCR Nutrition Label Scanner (simulated)
+- [x] Child Safe Mode filter in Discover
+- [ ] Full Bengali QA pass on all new screens
+- [ ] Dark mode QA pass on all new screens
