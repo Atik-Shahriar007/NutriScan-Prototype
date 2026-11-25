@@ -25,8 +25,12 @@ const GOAL_LABELS: Record<string, { en: string; bn: string }> = {
   "increase-protein": { en: "increasing protein", bn: "প্রোটিন বৃদ্ধি" },
   "reduce-sugar": { en: "reducing sugar", bn: "চিনি কমানো" },
   "reduce-sodium": { en: "reducing sodium", bn: "সোডিয়াম কমানো" },
-  "increase-fiber": { en: "increasing fiber", bn: "আঁশ বৃদ্ধি" },
-  "weight-management": { en: "weight management", bn: "ওজন নিয়ন্ত্রণ" },
+  "improve-fiber": { en: "increasing fiber", bn: "আঁশ বৃদ্ধি" },
+  "better-awareness": { en: "label awareness", bn: "লেবেল সচেতনতা" },
+  "limit-saturated-fat": { en: "limiting unhealthy fats", bn: "অস্বাস্থ্যকর চর্বি কমানো" },
+  "less-processed": { en: "less processed foods", bn: "কম প্রক্রিয়াজাত খাবার" },
+  "portion-calories": { en: "mindful portions", bn: "পরিমিত অংশ" },
+  "smart-hydration": { en: "smarter drink choices", bn: "স্বাস্থ্যকর পানীয়" },
 };
 
 function hasAny(text: string, keywords: string[]): boolean {

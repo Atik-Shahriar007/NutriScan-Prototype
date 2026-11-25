@@ -81,6 +81,24 @@ function scoreCategoryLabel(score: number, language: "en" | "bn"): string {
   return language === "en" ? "Poor" : "দুর্বল";
 }
 
+const BENGALI_DIGITS = ["০", "১", "২", "৩", "৪", "৫", "৬", "৭", "৮", "৯"];
+
+function formatTeaspoonCount(tsp: number, language: "en" | "bn"): string {
+  const raw = Number(tsp.toFixed(2)).toString();
+  if (language === "en") return raw;
+  return raw.replace(/\d/g, (d) => BENGALI_DIGITS[Number(d)] ?? d);
+}
+
+function parseAddedSugarTeaspoons(item: NutritionItem): number | null {
+  const labelEn = item.label.en.toLowerCase();
+  if (!labelEn.includes("added sugar")) return null;
+  const match = item.amount.en.match(/(\d+(?:\.\d+)?)\s*g\b/i);
+  if (!match) return null;
+  const grams = Number(match[1]);
+  if (!Number.isFinite(grams)) return null;
+  return grams / 4;
+}
+
 function NutritionRow({
   item,
   expanded,
@@ -99,10 +117,23 @@ function NutritionRow({
       : item.tone === "caution"
         ? palette.clay
         : palette.amber;
+  const teaspoons = parseAddedSugarTeaspoons(item);
+  const tspText = teaspoons !== null ? formatTeaspoonCount(teaspoons, language) : null;
+  const tspLabel =
+    teaspoons !== null && tspText !== null
+      ? language === "en"
+        ? `${tspText} ${teaspoons === 1 ? "teaspoon" : "teaspoons"} sugar`
+        : `${tspText} চা-চামচ চিনি`
+      : null;
+
   return (
     <Pressable
       accessibilityRole="button"
-      accessibilityLabel={`${item.label[language]}, ${item.amount[language]}`}
+      accessibilityLabel={
+        tspLabel
+          ? `${item.label[language]}, ${item.amount[language]}, ${tspLabel}`
+          : `${item.label[language]}, ${item.amount[language]}`
+      }
       accessibilityHint={
         language === "en"
           ? "Double tap to show explanation"
@@ -122,7 +153,7 @@ function NutritionRow({
     >
       <View style={{ flexDirection: "row", alignItems: "center", gap: 11 }}>
         <MaterialCommunityIcons name={item.icon} size={20} color={palette.muted} />
-        <View style={{ flex: 1, gap: 3 }}>
+        <View style={{ flex: 1, minWidth: 100, gap: 3 }}>
           <AppText weight="semibold" style={{ fontSize: 13 }}>
             {item.label[language]}
           </AppText>
@@ -130,9 +161,36 @@ function NutritionRow({
             {item.note[language]}
           </AppText>
         </View>
-        <AppText style={{ color: palette.muted, fontSize: 12 }}>
-          {item.amount[language]}
-        </AppText>
+        <View style={{ alignItems: "flex-end", gap: 4 }}>
+          <View style={{ flexDirection: "row", alignItems: "center", gap: 6, flexWrap: "wrap", justifyContent: "flex-end" }}>
+            <AppText weight="semibold" style={{ color: palette.ink, fontSize: 12 }}>
+              {item.amount[language]}
+            </AppText>
+            {tspLabel ? (
+              <View
+                style={{
+                  flexDirection: "row",
+                  alignItems: "center",
+                  gap: 4,
+                  paddingHorizontal: 7,
+                  paddingVertical: 3,
+                  borderRadius: 100,
+                  backgroundColor:
+                    item.tone === "positive"
+                      ? palette.greenSoft
+                      : item.tone === "caution"
+                        ? palette.claySoft
+                        : palette.amberSoft,
+                }}
+              >
+                <MaterialCommunityIcons name="spoon-sugar" size={13} color={toneColor} />
+                <AppText weight="semibold" style={{ fontSize: 10, color: toneColor }}>
+                  {tspLabel}
+                </AppText>
+              </View>
+            ) : null}
+          </View>
+        </View>
         <View
           style={{
             width: 10,
@@ -155,11 +213,19 @@ function NutritionRow({
             padding: 11,
             borderRadius: 12,
             backgroundColor: palette.paper,
+            gap: 4,
           }}
         >
           <AppText style={{ color: palette.muted, fontSize: 10, lineHeight: 16 }}>
             {item.detail[language]}
           </AppText>
+          {tspLabel ? (
+            <AppText style={{ color: palette.muted, fontSize: 10, lineHeight: 15 }}>
+              {language === "en"
+                ? "Sugar guide: 4 g sugar = 1 teaspoon"
+                : "হিসাব: ৪ গ্রাম চিনি = ১ চা-চামচ"}
+            </AppText>
+          ) : null}
         </View>
       ) : null}
     </Pressable>

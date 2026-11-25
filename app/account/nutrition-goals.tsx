@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Pressable, View } from "react-native";
+import { Pressable, TextInput, View } from "react-native";
 import { useRouter } from "expo-router";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import {
@@ -10,6 +10,7 @@ import {
   PrimaryButton,
   Screen,
   SectionHeading,
+  fontFamily,
   usePalette,
 } from "@/components/nutriscan-ui";
 import type { Localized } from "@/lib/nutriscan-data";
@@ -78,7 +79,45 @@ const GOAL_OPTIONS: GoalOption[] = [
       bn: "খাবারের লেবেল পড়তে ও বুঝতে শিখুন",
     },
   },
+  {
+    id: "limit-saturated-fat",
+    icon: "heart-pulse",
+    title: { en: "Limit Unhealthy Fats", bn: "অস্বাস্থ্যকর চর্বি কমানো" },
+    body: {
+      en: "Watch saturated fat, palm oil, and fried snack fats on labels",
+      bn: "লেবেলে স্যাচুরেটেড ফ্যাট, পাম তেল ও ভাজা স্ন্যাকসের চর্বি লক্ষ্য করুন",
+    },
+  },
+  {
+    id: "less-processed",
+    icon: "food-apple-outline",
+    title: { en: "Choose Less Processed Foods", bn: "কম প্রক্রিয়াজাত খাবার" },
+    body: {
+      en: "Prefer shorter ingredient lists with fewer artificial additives",
+      bn: "কম কৃত্রিম উপাদান ও সংক্ষিপ্ত উপাদান-তালিকার খাবার বেছে নিন",
+    },
+  },
+  {
+    id: "portion-calories",
+    icon: "silverware-fork-knife",
+    title: { en: "Mindful Portions & Calories", bn: "পরিমিত অংশ ও ক্যালোরি" },
+    body: {
+      en: "Compare serving sizes and energy per pack before buying",
+      bn: "কেনার আগে প্রতি প্যাকের পরিবেশনের পরিমাণ ও ক্যালোরি তুলনা করুন",
+    },
+  },
+  {
+    id: "smart-hydration",
+    icon: "cup-water",
+    title: { en: "Smarter Drink Choices", bn: "স্বাস্থ্যকর পানীয় নির্বাচন" },
+    body: {
+      en: "Pick lower-sugar drinks and stay mindful of sweetened beverages",
+      bn: "কম চিনির পানীয় বেছে নিন এবং মিষ্টি পানীয়ের পরিমাণ খেয়াল রাখুন",
+    },
+  },
 ];
+
+const PRESET_GOAL_IDS = new Set(GOAL_OPTIONS.map((g) => g.id));
 
 export default function NutritionGoalsScreen() {
   const router = useRouter();
@@ -86,6 +125,10 @@ export default function NutritionGoalsScreen() {
   const { language, healthProfile, setHealthProfile } = useNutriScan();
 
   const [selected, setSelected] = useState<string[]>(healthProfile.nutritionGoals);
+  const [customGoals, setCustomGoals] = useState<string[]>(() =>
+    healthProfile.nutritionGoals.filter((id) => !PRESET_GOAL_IDS.has(id)),
+  );
+  const [customDraft, setCustomDraft] = useState("");
   const [saved, setSaved] = useState(false);
 
   const toggleGoal = (id: string) => {
@@ -95,10 +138,55 @@ export default function NutritionGoalsScreen() {
     );
   };
 
+  const handleAddCustomGoal = () => {
+    const clean = customDraft.trim();
+    if (!clean) return;
+    const lower = clean.toLowerCase();
+
+    const matchedPreset = GOAL_OPTIONS.find(
+      (g) =>
+        g.id.toLowerCase() === lower ||
+        g.title.en.toLowerCase() === lower ||
+        g.title.bn.toLowerCase() === lower,
+    );
+    if (matchedPreset) {
+      if (!selected.includes(matchedPreset.id)) {
+        setSelected((curr) => [...curr, matchedPreset.id]);
+      }
+      setSaved(false);
+      setCustomDraft("");
+      return;
+    }
+
+    const matchedCustom = customGoals.find((g) => g.toLowerCase() === lower);
+    const goalValue = matchedCustom ?? clean;
+    if (!matchedCustom) {
+      setCustomGoals((curr) => [...curr, clean]);
+    }
+    if (!selected.includes(goalValue)) {
+      setSelected((curr) => [...curr, goalValue]);
+    }
+    setSaved(false);
+    setCustomDraft("");
+  };
+
   const handleSave = () => {
     setHealthProfile({ nutritionGoals: selected });
     setSaved(true);
   };
+
+  const allGoals: GoalOption[] = [
+    ...GOAL_OPTIONS,
+    ...customGoals.map((goal) => ({
+      id: goal,
+      icon: "star-circle-outline" as const,
+      title: { en: goal, bn: goal },
+      body: {
+        en: "Custom nutrition goal added by you",
+        bn: "আপনার যোগ করা নিজস্ব পুষ্টির লক্ষ্য",
+      },
+    })),
+  ];
 
   return (
     <Screen contentStyle={{ gap: 16 }}>
@@ -118,7 +206,7 @@ export default function NutritionGoalsScreen() {
       />
 
       <View style={{ gap: 10 }}>
-        {GOAL_OPTIONS.map((goal) => {
+        {allGoals.map((goal) => {
           const isSelected = selected.includes(goal.id);
           return (
             <Pressable
@@ -171,6 +259,73 @@ export default function NutritionGoalsScreen() {
           );
         })}
       </View>
+
+      <Card style={{ gap: 10 }}>
+        <AppText weight="semibold" style={{ fontSize: 13 }}>
+          {language === "en" ? "Add a custom goal" : "নিজস্ব লক্ষ্য যোগ করুন"}
+        </AppText>
+        <View style={{ flexDirection: "row", alignItems: "center", gap: 8 }}>
+          <TextInput
+            value={customDraft}
+            onChangeText={setCustomDraft}
+            onSubmitEditing={handleAddCustomGoal}
+            returnKeyType="done"
+            placeholder={
+              language === "en"
+                ? "e.g. Eat more leafy greens..."
+                : "যেমন: বেশি শাকসবজি খাওয়া..."
+            }
+            placeholderTextColor={palette.muted}
+            style={{
+              flex: 1,
+              minHeight: 44,
+              borderWidth: 1,
+              borderColor: palette.line,
+              backgroundColor: palette.paper,
+              borderRadius: 12,
+              paddingHorizontal: 12,
+              paddingVertical: 10,
+              fontSize: 13,
+              color: palette.ink,
+              fontFamily: fontFamily(language, "regular"),
+            }}
+          />
+          <Pressable
+            accessibilityRole="button"
+            accessibilityLabel={language === "en" ? "Add custom goal" : "নিজস্ব লক্ষ্য যোগ করুন"}
+            onPress={handleAddCustomGoal}
+            disabled={!customDraft.trim()}
+            style={({ pressed }) => ({
+              minHeight: 44,
+              paddingHorizontal: 14,
+              borderRadius: 12,
+              backgroundColor: customDraft.trim() ? palette.greenSoft : palette.neutralSoft,
+              borderWidth: 1,
+              borderColor: customDraft.trim() ? palette.green : palette.line,
+              flexDirection: "row",
+              alignItems: "center",
+              justifyContent: "center",
+              gap: 5,
+              opacity: pressed ? 0.8 : 1,
+            })}
+          >
+            <MaterialCommunityIcons
+              name="plus"
+              size={18}
+              color={customDraft.trim() ? palette.green : palette.muted}
+            />
+            <AppText
+              weight="semibold"
+              style={{
+                fontSize: 12,
+                color: customDraft.trim() ? palette.green : palette.muted,
+              }}
+            >
+              {language === "en" ? "Add" : "যোগ"}
+            </AppText>
+          </Pressable>
+        </View>
+      </Card>
 
       <PrimaryButton
         title={language === "en" ? "Save Goals" : "লক্ষ্য সংরক্ষণ করুন"}

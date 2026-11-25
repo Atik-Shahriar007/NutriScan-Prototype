@@ -11,9 +11,10 @@ import {
   PrimaryButton,
   Screen,
   SectionHeading,
+  fontFamily,
   usePalette,
 } from "@/components/nutriscan-ui";
-import type { Localized } from "@/lib/nutriscan-data";
+import type { Language, Localized } from "@/lib/nutriscan-data";
 import { t } from "@/lib/nutriscan-data";
 import { useNutriScan } from "@/lib/nutriscan-state";
 
@@ -83,6 +84,156 @@ function togglePlain(current: string[], value: string): string[] {
     : [...current, value];
 }
 
+function SelectableChipSection({
+  title,
+  baseOptions,
+  selected,
+  onChange,
+  placeholder,
+  language,
+  exclusiveNone = false,
+}: {
+  title: string;
+  baseOptions: { value: string; label: Localized }[];
+  selected: string[];
+  onChange: (next: string[]) => void;
+  placeholder: string;
+  language: Language;
+  exclusiveNone?: boolean;
+}) {
+  const palette = usePalette();
+  const baseValueSet = new Set(baseOptions.map((opt) => opt.value));
+  const [customItems, setCustomItems] = useState<string[]>(() =>
+    selected.filter((item) => !baseValueSet.has(item)),
+  );
+  const [draft, setDraft] = useState("");
+
+  const mergedOptions: { value: string; label: Localized }[] = [
+    ...baseOptions,
+    ...customItems.map((item) => ({ value: item, label: { en: item, bn: item } })),
+  ];
+
+  const handleToggle = (val: string) => {
+    onChange(exclusiveNone ? toggleWithNone(selected, val) : togglePlain(selected, val));
+  };
+
+  const handleAddManual = () => {
+    const clean = draft.trim();
+    if (!clean) return;
+    const lower = clean.toLowerCase();
+
+    const matchedBase = baseOptions.find(
+      (opt) =>
+        opt.value.toLowerCase() === lower ||
+        opt.label.en.toLowerCase() === lower ||
+        opt.label.bn.toLowerCase() === lower,
+    );
+
+    if (matchedBase) {
+      if (!selected.includes(matchedBase.value)) {
+        onChange(
+          exclusiveNone
+            ? toggleWithNone(selected, matchedBase.value)
+            : togglePlain(selected, matchedBase.value),
+        );
+      }
+      setDraft("");
+      return;
+    }
+
+    const matchedCustom = customItems.find((item) => item.toLowerCase() === lower);
+    const targetValue = matchedCustom ?? clean;
+    if (!matchedCustom) {
+      setCustomItems((curr) => [...curr, clean]);
+    }
+    if (!selected.includes(targetValue)) {
+      const baseSelected = exclusiveNone
+        ? selected.filter((item) => item !== "none")
+        : selected;
+      onChange([...baseSelected, targetValue]);
+    }
+    setDraft("");
+  };
+
+  return (
+    <Card style={{ gap: 12 }}>
+      <SectionHeading title={title} />
+      <ChipSelect
+        options={mergedOptions}
+        selected={selected}
+        onToggle={handleToggle}
+        language={language}
+      />
+      <View
+        style={{
+          flexDirection: "row",
+          alignItems: "center",
+          gap: 8,
+          paddingTop: 4,
+          borderTopWidth: 1,
+          borderTopColor: palette.line,
+        }}
+      >
+        <TextInput
+          value={draft}
+          onChangeText={setDraft}
+          onSubmitEditing={handleAddManual}
+          returnKeyType="done"
+          placeholder={placeholder}
+          placeholderTextColor={palette.muted}
+          style={{
+            flex: 1,
+            minHeight: 44,
+            borderWidth: 1,
+            borderColor: palette.line,
+            backgroundColor: palette.paper,
+            borderRadius: 12,
+            paddingHorizontal: 12,
+            paddingVertical: 10,
+            fontSize: 13,
+            color: palette.ink,
+            fontFamily: fontFamily(language, "regular"),
+          }}
+        />
+        <Pressable
+          accessibilityRole="button"
+          accessibilityLabel={language === "en" ? `Add ${title}` : `${title} যোগ করুন`}
+          onPress={handleAddManual}
+          disabled={!draft.trim()}
+          style={({ pressed }) => ({
+            minHeight: 44,
+            paddingHorizontal: 14,
+            borderRadius: 12,
+            backgroundColor: draft.trim() ? palette.greenSoft : palette.neutralSoft,
+            borderWidth: 1,
+            borderColor: draft.trim() ? palette.green : palette.line,
+            flexDirection: "row",
+            alignItems: "center",
+            justifyContent: "center",
+            gap: 5,
+            opacity: pressed ? 0.8 : 1,
+          })}
+        >
+          <MaterialCommunityIcons
+            name="plus"
+            size={17}
+            color={draft.trim() ? palette.green : palette.muted}
+          />
+          <AppText
+            weight="semibold"
+            style={{
+              fontSize: 12,
+              color: draft.trim() ? palette.green : palette.muted,
+            }}
+          >
+            {language === "en" ? "Add" : "যোগ"}
+          </AppText>
+        </Pressable>
+      </View>
+    </Card>
+  );
+}
+
 export default function HealthProfileScreen() {
   const router = useRouter();
   const palette = usePalette();
@@ -107,6 +258,7 @@ export default function HealthProfileScreen() {
     paddingVertical: 11,
     fontSize: 13,
     color: palette.ink,
+    fontFamily: fontFamily(language, "regular"),
   };
 
   const handleSave = () => {
@@ -230,57 +382,56 @@ export default function HealthProfileScreen() {
         </View>
       </Card>
 
-      <Card style={{ gap: 12 }}>
-        <SectionHeading title={language === "en" ? "Health Conditions" : "স্বাস্থ্য অবস্থা"} />
-        <ChipSelect
-          options={CONDITION_OPTIONS}
-          selected={conditions}
-          onToggle={(val) => {
-            setConditions((curr) => toggleWithNone(curr, val));
-            setSaved(false);
-          }}
-          language={language}
-        />
-      </Card>
+      <SelectableChipSection
+        title={language === "en" ? "Health Conditions" : "স্বাস্থ্য অবস্থা"}
+        baseOptions={CONDITION_OPTIONS}
+        selected={conditions}
+        onChange={(next) => {
+          setConditions(next);
+          setSaved(false);
+        }}
+        placeholder={language === "en" ? "Add another condition manually..." : "নিজে অন্য কোনো অবস্থা লিখুন..."}
+        language={language}
+        exclusiveNone
+      />
 
-      <Card style={{ gap: 12 }}>
-        <SectionHeading title={language === "en" ? "Dietary Restrictions" : "খাদ্যতালিকাগত বিধিনিষেধ"} />
-        <ChipSelect
-          options={DIETARY_OPTIONS}
-          selected={dietary}
-          onToggle={(val) => {
-            setDietary((curr) => togglePlain(curr, val));
-            setSaved(false);
-          }}
-          language={language}
-        />
-      </Card>
+      <SelectableChipSection
+        title={language === "en" ? "Dietary Restrictions" : "খাদ্যতালিকাগত বিধিনিষেধ"}
+        baseOptions={DIETARY_OPTIONS}
+        selected={dietary}
+        onChange={(next) => {
+          setDietary(next);
+          setSaved(false);
+        }}
+        placeholder={language === "en" ? "Add another restriction manually..." : "নিজে অন্য কোনো বিধিনিষেধ লিখুন..."}
+        language={language}
+      />
 
-      <Card style={{ gap: 12 }}>
-        <SectionHeading title={language === "en" ? "Food Allergies" : "খাবারে অ্যালার্জি"} />
-        <ChipSelect
-          options={ALLERGY_OPTIONS}
-          selected={allergies}
-          onToggle={(val) => {
-            setAllergies((curr) => toggleWithNone(curr, val));
-            setSaved(false);
-          }}
-          language={language}
-        />
-      </Card>
+      <SelectableChipSection
+        title={language === "en" ? "Food Allergies" : "খাবারে অ্যালার্জি"}
+        baseOptions={ALLERGY_OPTIONS}
+        selected={allergies}
+        onChange={(next) => {
+          setAllergies(next);
+          setSaved(false);
+        }}
+        placeholder={language === "en" ? "Add another allergy manually..." : "নিজে অন্য কোনো অ্যালার্জি লিখুন..."}
+        language={language}
+        exclusiveNone
+      />
 
-      <Card style={{ gap: 12 }}>
-        <SectionHeading title={language === "en" ? "Food Intolerances" : "খাদ্য অসহিষ্ণুতা"} />
-        <ChipSelect
-          options={INTOLERANCE_OPTIONS}
-          selected={intolerances}
-          onToggle={(val) => {
-            setIntolerances((curr) => toggleWithNone(curr, val));
-            setSaved(false);
-          }}
-          language={language}
-        />
-      </Card>
+      <SelectableChipSection
+        title={language === "en" ? "Food Intolerances" : "খাদ্য অসহিষ্ণুতা"}
+        baseOptions={INTOLERANCE_OPTIONS}
+        selected={intolerances}
+        onChange={(next) => {
+          setIntolerances(next);
+          setSaved(false);
+        }}
+        placeholder={language === "en" ? "Add another intolerance manually..." : "নিজে অন্য কোনো অসহিষ্ণুতা লিখুন..."}
+        language={language}
+        exclusiveNone
+      />
 
       <PrimaryButton
         title={language === "en" ? "Save Health Profile" : "স্বাস্থ্য প্রোফাইল সংরক্ষণ করুন"}
